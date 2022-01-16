@@ -1,4 +1,4 @@
-(ns caesarhu.euler-005
+(ns caesarhu.project-euler.euler-005
   (:require [caesarhu.math.math-tools :refer [lcm*]]))
 
 (defn euler-005

@@ -1,4 +1,4 @@
-(ns caesarhu.euler-001)
+(ns caesarhu.project-euler.euler-001)
 
 (defn sum-of-numbers
   [limit step]

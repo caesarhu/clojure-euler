@@ -1,4 +1,4 @@
-(ns caesarhu.euler-002)
+(ns caesarhu.project-euler.euler-002)
 
 (def fib-seq
   ((fn fib [a b]

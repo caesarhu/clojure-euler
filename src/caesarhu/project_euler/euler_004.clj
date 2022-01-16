@@ -1,4 +1,4 @@
-(ns caesarhu.euler-004
+(ns caesarhu.project-euler.euler-004
   (:require [caesarhu.math.math-tools :refer [palindrome?]]))
 
 (defn euler-004

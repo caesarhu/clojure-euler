@@ -1,4 +1,4 @@
-(ns caesarhu.euler-006)
+(ns caesarhu.project-euler.euler-006)
 
 (defn sum-of-numbers
   [n]
