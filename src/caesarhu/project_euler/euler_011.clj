@@ -1,4 +1,4 @@
-(ns caesarhu.euler-011)
+(ns caesarhu.project-euler.euler-011)
 
 (def grid
   (vec (map vec (partition 20 [8 2 22 97 38 15 0 40 0 75 4 5 7 78 52 12 50 77 91 8
@@ -23,19 +23,22 @@
                                1 70 54 71 83 51 54 69 16 92 33 48 61 43 52 1 89 19 67 48]))))
 
 (defn walk
-  [pos direction]
-  (iterate #(map + % direction) pos))
+  [grid pos direction]
+  (->> (iterate #(map + % direction) pos)
+       (map #(get-in grid %))
+       (take-while some?)))
 
 (defn columns
-  [v]
-  (let [length (count v)]
+  [grid]
+  (let [length (count grid)]
     (for [i (range length)]
-      (->> (walk [0 i] [1 0]) (take length)))))
+      (walk grid [0 i] [1 0]))))
 
 (defn diag-1
-  [v]
-  (let [length (count v)
-        roots (for [i (range length)
-                    :let [j (- length i 1)]]
-                [i j])]
+  [grid]
+  (let [length (count grid)
+        roots (concat (for [i (range length)]
+                        [0 i])
+                      (for [j (range length)]
+                        [j 0]))]
     roots))

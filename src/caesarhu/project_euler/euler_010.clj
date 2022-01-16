@@ -1,4 +1,4 @@
-(ns caesarhu.euler-010
+(ns caesarhu.project-euler.euler-010
   (:require [caesarhu.math.primes :refer [primes]]))
 
 (defn euler-010
