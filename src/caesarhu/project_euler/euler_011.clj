@@ -41,4 +41,4 @@
                         [0 i])
                       (for [j (range length)]
                         [j 0]))]
-    roots))
+    (map #(walk grid % [1 1]) roots)))
