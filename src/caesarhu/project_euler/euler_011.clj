@@ -28,17 +28,28 @@
        (map #(get-in grid %))
        (take-while some?)))
 
-(defn columns
-  [grid]
-  (let [length (count grid)]
-    (for [i (range length)]
-      (walk grid [0 i] [1 0]))))
-
-(defn diag-1
+(defn walk-all
   [grid]
   (let [length (count grid)
-        roots (concat (for [i (range length)]
-                        [0 i])
-                      (for [j (range length)]
-                        [j 0]))]
-    (map #(walk grid % [1 1]) roots)))
+        rows (map #(walk grid % [0 1]) (map #(vector % 0) (range length)))
+        cols (map #(walk grid % [1 0]) (map #(vector 0 %) (range length)))
+        diag-1 (->> (mapcat #(vector [% 0] [0 %]) (range length))
+                    distinct
+                    (map #(walk grid % [1 1]))
+                    (filter #(>= (count %) 4)))
+        diag-2 (->> (mapcat #(vector [% (dec length)] [0 %]) (range length))
+                    distinct
+                    (map #(walk grid % [1 -1]))
+                    (filter #(>= (count %) 4)))]
+    (concat rows cols diag-1 diag-2)))
+
+(defn euler-011
+  []
+  (->> (walk-all grid)
+       (mapcat #(partition 4 1 %))
+       (map #(apply * %))
+       (apply max)))
+
+(comment
+  (time (euler-011))
+  )

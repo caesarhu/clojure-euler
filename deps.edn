@@ -6,6 +6,8 @@
                               :sha "e86742c467efa62b17239bd679f4c60d85026ecf"}
         caesarhu.math/math-tools {:git/url "https://github.com/caesarhu/math-tools"
                                   :sha "5ba5f8c40023ee7c0f23fe85f6b5f087ad1b6099"}
+        org.clojure/core.cache {:mvn/version "1.0.225"}
+        org.clojure/core.memoize {:mvn/version "1.0.253"}
         org.clojure/tools.namespace {:mvn/version "1.2.0"}}
  :aliases
  {:build {:deps {io.github.seancorfield/build-clj
