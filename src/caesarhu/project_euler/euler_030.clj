@@ -13,8 +13,9 @@
 
 (defn euler-030
   []
-  (->> (range 2 1000000)
-       (filter powers-5-number?)))
+  (->> (range 2 (* 6 (expt 9 5)))
+       (filter powers-5-number?)
+       (apply +)))
 
 (comment
   (time (euler-030))
