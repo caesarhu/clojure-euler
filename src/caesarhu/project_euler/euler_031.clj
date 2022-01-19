@@ -1,25 +1,20 @@
 (ns caesarhu.project-euler.euler-031)
 
-(def coins (reverse [1 2 5 10 20 50 100 200]))
+(def coins [200 100 50 20 10 5 2 1])
 
-(defn target-changes
+(defn changes
   [result target coins]
-  (cond
-    (zero? target) [result]
-    (empty? coins) nil
-    :else (let [coin (first coins)
-                amount (quot target coin)]
-            (if (= (count coins) 1)
-              (let [cs (repeat amount coin)]
-                (target-changes (concat result cs) (- target (apply + cs)) (rest coins)))
-              (->> (for [i (reverse (range (inc amount)))
-                         :let [cs (repeat i coin)]]
-                     (target-changes (concat result cs) (- target (apply + cs)) (rest coins)))
-                   (apply concat))))))
+  (let [coin (first coins)]
+    (cond
+      (zero? target) [result]
+      (= coin 1) [(concat result (repeat target coin))]
+      :else (reduce concat
+                    (for [i (range (inc (quot target coin)))]
+                      (changes (concat result (repeat i coin)) (- target (* coin i)) (rest coins)))))))
 
 (defn euler-031
   [target]
-  (-> (target-changes [] target coins) count))
+  (-> (changes [] target coins) count))
 
 (comment
   (time (euler-031 200))
