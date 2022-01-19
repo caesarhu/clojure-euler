@@ -15,17 +15,17 @@
 
 (defn pandigital-multiples
   [n]
-  (let [ds (->> (map #(* n %) (range 1 10))
+  (let [ds (->> (map #(* n %) (range 1 6))
                 take-9-digits)]
     (and (is-pandigital? ds) (tools/digits->number ds))))
 
 (defn solve
-  [n]
-  (->> (range 2 n)
+  []
+  (->> (range 9 10000)
        (map pandigital-multiples)
        (remove false?)
        (apply max)))
 
 (comment
-  (time (solve 10000))
+  (time (solve))
   )
