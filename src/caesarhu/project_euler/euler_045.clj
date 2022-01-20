@@ -6,4 +6,20 @@
 
 (defn pentagonal?
   [c]
-  (poly/quadratic-root-pred? pos-int? 3/2 -1/2 (- (/ c 2))))
+  (poly/quadratic-root-pred? pos-int? 3 -1 (- (* 2 c))))
+
+(defn triangle?
+  [c]
+  (poly/quadratic-root-pred? pos-int? 1 1 (- (* 2 c))))
+
+(defn euler-045
+  []
+  (->> (map hexagonal (iterate inc 2))
+       (filter pentagonal?)
+       (filter triangle?)
+       rest
+       first))
+
+(comment
+  (time (euler-045))
+  )
