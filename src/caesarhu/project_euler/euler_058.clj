@@ -11,14 +11,14 @@
 
 (defn euler-058
   [target]
-  (reduce (fn [[nums primes] n]
+  (reduce (fn [[primes nums] n]
             (let [ns (+ nums 4)
                   ps (->> (corners n) (filter p/is-prime?) count (+ primes))]
               (if (> target (/ ps ns))
                 (reduced n)
-                [ns ps]))) 
-          [1 0] (iterate #(+ % 2) 3)))
+                [ps ns]))) 
+          [0 1] (iterate #(+ % 2) 3)))
 
 (comment
-  (euler-058 1/10)
+  (time (euler-058 1/10))
   )
