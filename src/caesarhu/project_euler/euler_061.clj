@@ -34,7 +34,12 @@
   [n]
   [(quot n 100) (mod n 100)])
 
+(defn take-digits
+  [f]
+  (->> (map f (iterate inc 1))
+       (drop-while #(< % 1000))
+       (take-while #(< % 10000))))
+
 (comment
-  (->> (map p8 (iterate inc 1))
-       (take 100))
+  (take-digits p3)
   )
