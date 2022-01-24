@@ -25,11 +25,16 @@
   ((let [f (poly/quadratic 5 -3 0)]
      (quot (f n) 2))))
 
-(defn p6
+(defn p8
   [n]
   (let [f (poly/quadratic 3 -2 0)]
     (f n)))
 
+(defn seperate
+  [n]
+  [(quot n 100) (mod n 100)])
+
 (comment
-  (p6 3)
+  (->> (map p8 (iterate inc 1))
+       (take 100))
   )
