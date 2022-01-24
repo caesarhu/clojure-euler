@@ -1,39 +1,6 @@
 (ns caesarhu.project-euler.euler-060
   (:require [caesarhu.math.primes :as p]
-            [caesarhu.math.math-tools :as tools]
-            [clojure.core.memoize :as m]))
-
-(def concatenated-primes
-  (m/lu
-   (fn [n limit]
-     (let [d (tools/digits n)]
-       (set
-        (for [a (p/primes-range 2 limit)
-              :when (and
-                     (p/is-prime? (tools/digits->number (concat d (tools/digits a))))
-                     (p/is-prime? (tools/digits->number (concat (tools/digits a) d))))]
-          a))))
-   :lu/threshold 10000))
-
-(defn subset 
-  [limit & ks]
-  (let [s (apply clojure.set/intersection (map #(concatenated-primes % limit) ks))]
-    (apply (partial disj s) ks)))
-
-(defn euler-060 
-  [limit]
-  (first
-   (for [a (p/primes-range 2 limit)
-         b (subset limit a)
-         c (subset limit a b)
-         d (subset limit a b c)
-         e (subset limit a b c d)
-         :let [s [a b c d e]]]
-     {:sum (reduce + s) :primes s})))
-
-(comment
-  (time (euler-060 10000))
-  )
+            [caesarhu.math.math-tools :as tools]))
 
 (defn concatenated?
   [p1 p2]
@@ -43,8 +10,22 @@
          (map tools/digits->number)
          (every? p/is-prime?))))
 
-(def limit-primes (p/primes-range 10000))
+(defn next-map
+  [m]
+  (->> (for [[k v] m
+             p v
+             :let [ps (filter #(concatenated? p %) v)]]
+         {(conj k p) ps})
+       (apply merge)))
+
+(defn euler-060
+  [limit n]
+  (loop [m {#{} (p/primes-range limit)}
+         n n]
+    (if (zero? n)
+      (->> (keys m) (map #(apply + %)) (apply min))
+      (recur (next-map m) (dec n)))))
 
 (comment
-  (filter #(concatenated? 13 %) limit-primes)
+  (time (euler-060 10000 5))
   )
