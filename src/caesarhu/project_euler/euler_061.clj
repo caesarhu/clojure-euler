@@ -1,22 +1,20 @@
-(ns caesarhu.project-euler.euler-061
-  (:require [caesarhu.math.polynomial :as poly]))
+(ns caesarhu.project-euler.euler-061)
 
 (defn polygon
-  ([a b c q]
-   (let [f1 (poly/quadratic a b c)
-         f2 #(quot % q)]
-     (comp f2 f1)))
-  ([a b c]
-   (polygon a b c 1)))
+  ([a b q]
+   (fn [n]
+     (quot (+ (* a n n) (* b n)) q)))
+  ([a b]
+   (polygon a b 1)))
 
 (def polygon-fns
   (map #(apply polygon %)
-       [[1 1 0 2]
-        [1 0 0]
-        [3 -1 0 2]
-        [2 -1 0]
-        [5 -3 0 2]
-        [3 -2 0]]))
+       [[1 1 2]  ; p3
+        [1 0]    ; p4
+        [3 -1 2] ; p5
+        [2 -1]   ; p6
+        [5 -3 2] ; p7
+        [3 -2]])) ; p8
 
 (defn seperate
   [n]
