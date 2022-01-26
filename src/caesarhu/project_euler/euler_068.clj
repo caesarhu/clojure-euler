@@ -17,8 +17,7 @@
         init-outer (->> (range (inc n) (inc (* n 2)))
                         reverse
                         (#(cons (last %) (butlast %))))]
-    (->> (range 1 (inc n))
-         reverse
+    (->> (range n 0 -1)
          combo/permutations
          (map #(vec (concat % init-outer)))
          (map ->edges)
