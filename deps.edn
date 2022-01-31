@@ -5,7 +5,7 @@
         caesarhu.math/primes {:git/url "https://github.com/caesarhu/primes"
                               :sha "78764a70105b2ae3ef47431f76459f833309c427"}
         caesarhu.math/math-tools {:git/url "https://github.com/caesarhu/math-tools"
-                                  :sha "0373cf6ad87b2c8044b36bb6daa75abd41c3a9d8"}
+                                  :sha "e473ae8e2e62082a8dfa5cc9d6ace26cf49db72a"}
         org.clojure/core.cache {:mvn/version "1.0.225"}
         org.clojure/core.memoize {:mvn/version "1.0.253"}
         org.clojure/tools.namespace {:mvn/version "1.2.0"}}
