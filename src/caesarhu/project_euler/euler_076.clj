@@ -35,11 +35,22 @@
         (swap! sum assoc j (+ sj sj-i))))
     @sum))
 
+(defn count-sum2
+  [limit]
+  (loop [sum (into {} (for [i (range (inc limit))]
+                        [i 1]))
+         i 2]
+    (if (> i limit) sum
+        (let [new-sum (loop [jsum sum
+                             j i]
+                        (if (> j limit) jsum
+                            (recur (merge-with + jsum {j (jsum (- j i))}) (inc j))))]
+          (recur new-sum (inc i))))))
+
 (defn euler-076
   [n]
-  (-> (count-sum n) last dec))
+  (-> (count-sum2 n) (#(% n)) dec))
 
 (comment
   (time (euler-076 100))
-  (time (brute-force 75))
   )
