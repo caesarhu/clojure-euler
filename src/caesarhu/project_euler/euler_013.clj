@@ -11,3 +11,7 @@
        (take 10)
        tools/digits->number
        long))
+
+(comment
+  (time (euler-013))
+  )
