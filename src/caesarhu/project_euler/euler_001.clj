@@ -11,5 +11,6 @@
   (+ (sum-of-numbers (dec limit) 3) (sum-of-numbers (dec limit) 5) (- (sum-of-numbers (dec limit) 15))))
 
 (comment
+  (time (euler-001 1000000000))
   (time (euler-001 1000))
   )
