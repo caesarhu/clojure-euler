@@ -3,7 +3,7 @@
 
 (defn euler-007
   [n]
-  (nth primes (dec n)))
+  (nth (primes) (dec n)))
 
 (comment
   (euler-007 10001)
