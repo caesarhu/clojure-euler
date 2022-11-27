@@ -3,8 +3,7 @@
 
 (defn euler-010
   [n]
-  (->> (take-while #(< % n) primes)
-       (apply +)))
+  (apply + (primes n)))
 
 (comment
   (time (euler-010 2000000))
