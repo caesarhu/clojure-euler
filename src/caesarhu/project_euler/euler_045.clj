@@ -6,11 +6,11 @@
 
 (defn pentagonal?
   [c]
-  (poly/quadratic-root-pred? pos-int? 3 -1 (- (* 2 c))))
+  (some pos-int? (poly/quadratic-root 3 -1 (- (* 2 c)))))
 
 (defn triangle?
   [c]
-  (poly/quadratic-root-pred? pos-int? 1 1 (- (* 2 c))))
+  (some pos-int? (poly/quadratic-root 1 1 (- (* 2 c)))))
 
 (defn euler-045
   []

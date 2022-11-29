@@ -19,7 +19,7 @@
                 take-9-digits)]
     (and (is-pandigital? ds) (tools/digits->number ds))))
 
-(defn solve
+(defn euler-038
   []
   (->> (range 9 10000)
        (map pandigital-multiples)
@@ -27,5 +27,5 @@
        (apply max)))
 
 (comment
-  (time (solve))
+  (time (euler-038))
   )
