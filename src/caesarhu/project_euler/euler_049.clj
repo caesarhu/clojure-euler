@@ -15,7 +15,7 @@
 
 (defn euler-049
   []
-  (->> (p/primes-range 1000 10000)
+  (->> (p/primes 1000 10000)
        (map ->digits)
        (apply merge-with concat)
        (map last)

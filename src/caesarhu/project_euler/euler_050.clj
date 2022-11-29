@@ -4,9 +4,9 @@
 (defn consecutive-primes
   [limit]
   (loop [counter (range)]
-    (let [sum (apply + (take (first counter) p/primes))]
+    (let [sum (apply + (take (first counter) (p/primes)))]
       (if (> sum limit)
-        (take (dec (first counter)) p/primes)
+        (take (dec (first counter)) (p/primes))
         (recur (rest counter))))))
 
 (defn find-sum-prime
