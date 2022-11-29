@@ -4,28 +4,19 @@
 
 (defn truncatable-prime?
   [n]
-  (let [ds (tools/digits n)
-        truncate (fn [ds]
-                   (loop [ds ds
-                          dsr ds
-                          result []]
-                     (if (= (count ds) 1)
-                       result
-                       (let [new-ds (rest ds)
-                             new-dsr (butlast dsr)]
-                         (recur new-ds new-dsr (conj result 
-                                                     (tools/digits->number new-ds)
-                                                     (tools/digits->number new-dsr)))))))]
-    (->> (cons n (truncate ds))
+  (let [trun (fn [f v] (map #(f % v) (range 1 (count v))))
+        digits (tools/digits n)]
+    (->> (concat [digits] (trun take digits) (trun take-last digits))
+         (map tools/digits->number)
          (every? p/is-prime?))))
 
-(defn brute-force
-  []
-  (->> (drop 4 p/primes)
+(defn euler-037
+  [n]
+  (->> (drop 4 (p/primes))
        (filter truncatable-prime?)
-       (take 11)
+       (take (min 11 n))
        (apply +)))
 
 (comment
-  (time (brute-force))
+  (time (euler-037 11))
   )

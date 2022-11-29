@@ -9,15 +9,15 @@
     (->> (take (count ds) (iterate r ds))
          (map tools/digits->number))))
 
-(defn circular-prime?
-  [ps n]
-  (->> (rotate n)
-       (every? #(ps %))))
-
 (defn euler-035
   [limit]
-  (let [ps (set (take-while #(< % limit) p/primes))]
-    (count (filter #(circular-prime? ps %) ps))))
+  (let [primes-set (set (p/primes limit))
+        circular-prime? (fn [p]
+                          (and (every? odd? (tools/digits p))
+                               (every? #(primes-set %) (rotate p))))]
+    (-> (filter circular-prime? primes-set)
+        (conj 2)
+        count)))
 
 (comment
   (time (euler-035 1000000))

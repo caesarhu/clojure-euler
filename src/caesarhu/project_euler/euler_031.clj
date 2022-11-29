@@ -1,4 +1,5 @@
-(ns caesarhu.project-euler.euler-031)
+(ns caesarhu.project-euler.euler-031
+  (:require [caesarhu.kuafu.sat :as sat]))
 
 (def coins [200 100 50 20 10 5 2 1])
 
@@ -18,4 +19,19 @@
 
 (comment
   (time (euler-031 200))
+  )
+
+(defn kuafu-031
+  [n]
+  (let [model (sat/cp-model)
+        solver (sat/cp-solver)
+        coin-vars (map #(sat/int-var model 0 (quot n %)) coins)]
+    (sat/add-equality model (sat/weighted-sum coin-vars coins) n)
+    (sat/set-all-solutions solver true)
+    (reset! sat/*solutions* (list))
+    (sat/solve solver model (sat/callback coin-vars))
+    (count @sat/*solutions*)))
+
+(comment
+  (time (kuafu-031 200))
   )

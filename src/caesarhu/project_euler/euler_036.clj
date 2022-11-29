@@ -14,6 +14,5 @@
        (apply +)))
 
 (comment
-  (double-palindromes? 242)
   (time (euler-036 1000000))
   )

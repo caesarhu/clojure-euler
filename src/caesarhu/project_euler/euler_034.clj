@@ -18,6 +18,6 @@
        (apply +)))
 
 (comment
-  (euler-034)
+  (time (euler-034))
   )
 
