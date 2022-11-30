@@ -20,7 +20,7 @@
 
 (defn euler-060
   [limit n]
-  (loop [m {#{} (p/primes-range limit)}
+  (loop [m {#{} (p/primes limit)}
          n n]
     (if (zero? n)
       (->> (keys m) (map #(apply + %)) (apply min))
