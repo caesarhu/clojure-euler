@@ -27,16 +27,6 @@
 
 (defn count-sum
   [limit]
-  (let [sum (atom (vec (repeat (inc limit) 1)))]
-    (doseq [i (range 2 (inc limit))
-            j (range i (inc limit))]
-      (let [sj (@sum j)
-            sj-i (@sum (- j i))]
-        (swap! sum assoc j (+ sj sj-i))))
-    @sum))
-
-(defn count-sum2
-  [limit]
   (loop [sum (into {} (for [i (range (inc limit))]
                         [i 1]))
          i 2]
@@ -49,8 +39,9 @@
 
 (defn euler-076
   [n]
-  (-> (count-sum2 n) (#(% n)) dec))
+  (-> (count-sum n) (#(% n)) dec))
 
 (comment
+  (time (brute-force 100))
   (time (euler-076 100))
   )

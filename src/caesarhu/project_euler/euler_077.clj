@@ -12,7 +12,7 @@
 
 (defn prime-sums
   [n]
-  (count-prime-sums n (p/primes-range n)))
+  (count-prime-sums n (p/primes n)))
 
 (defn euler-077
   [limit]

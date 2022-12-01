@@ -1,5 +1,4 @@
-(ns caesarhu.project-euler.euler-078
-  (:require [clojure.core.memoize :as m]))
+(ns caesarhu.project-euler.euler-078)
 
 (def mod-number 1000000)
 (def sign (cycle [1 -1]))

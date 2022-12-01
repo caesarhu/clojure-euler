@@ -21,8 +21,8 @@
 (defn euler-070
   [limit]
   (let [sq (math/sqrt limit)
-        low-primes (reverse (p/primes-range sq))
-        hi-primes (take (* (count low-primes) 2) p/primes)]
+        low-primes (reverse (p/primes sq))
+        hi-primes (take (* (count low-primes) 2) (p/primes))]
     (->> (combo/combinations hi-primes 2)
          (filter #(< (apply * %) limit))
          (filter #(apply permutation? %))

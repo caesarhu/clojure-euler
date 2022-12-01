@@ -11,6 +11,7 @@
         caesarhu/kuafu {:git/url "https://github.com/caesarhu/kuafu"
                         :git/tag "v0.1.32"
                         :git/sha "473342f"}
+        aysylu/loom {:mvn/version "1.0.2"}
         org.clojure/core.cache {:mvn/version "1.0.225"}
         org.clojure/core.memoize {:mvn/version "1.0.257"}}
  :aliases

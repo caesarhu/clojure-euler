@@ -1,8 +1,9 @@
 (ns caesarhu.project-euler.euler-060
   (:require [caesarhu.math.primes :as p]
-            [caesarhu.math.math-tools :as tools]))
+            [caesarhu.math.math-tools :as tools]
+            [clojure.math.combinatorics :as combo]))
 
-(defn concatenated?
+(defn valid-pair?
   [p1 p2]
   (let [d1 (tools/digits p1)
         d2 (tools/digits p2)]
@@ -14,7 +15,7 @@
   [m]
   (->> (for [[k v] m
              p v
-             :let [ps (filter #(concatenated? p %) v)]]
+             :let [ps (filter #(valid-pair? p %) v)]]
          {(conj k p) ps})
        (apply merge)))
 
@@ -25,6 +26,7 @@
     (if (zero? n)
       (->> (keys m) (map #(apply + %)) (apply min))
       (recur (next-map m) (dec n)))))
+
 
 (comment
   (time (euler-060 10000 5))
