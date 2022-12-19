@@ -1,27 +1,27 @@
 (ns caesarhu.clojure-euler.euler-088
   (:require [caesarhu.math.primes :as p]))
 
-(defn generate-product-sum-map
-  [limit]
-  (let [product-sum-map (atom {})]
-    (letfn [(product-sum
-              [product sum num start]
-              (let [k (+ product (- sum) num)] 
-                (when (< k limit)
-                  (swap! product-sum-map #(merge-with min %1 %2) {k product})
-                  (doseq [i (range start (inc (* (quot limit product) 2)))]
-                    (product-sum (* product i) (+ sum i) (inc num) i)))
-                @product-sum-map))]
-      (product-sum 1 1 1 2))))
+(defn product-loop
+  [limit result-map]
+  (letfn [(product-sum [product sum c start] ; p:product s:sum c:count of factors
+            (let [k (+ product (- sum) c)]
+              (when (<= k limit)
+                (swap! result-map #(merge-with min %1 %2) {k product})
+                (doseq [i (iterate inc start)
+                        :let [next-product (* product i)]
+                        :while (<= next-product (* 2 limit))]
+                  (product-sum next-product (+ sum i) (inc c) i)))))]
+    (product-sum 1 1 1 2)))
 
-(defn solve
+(defn euler-088-atom
   [limit]
-  (->> (generate-product-sum-map (inc limit))
-       (#(dissoc % 1))
-       vals
-       distinct
-       (apply +)))
+  (let [result-map (atom {})]
+    (product-loop limit result-map)
+    (->> (dissoc @result-map 1)
+         vals
+         set
+         (apply +))))
 
 (comment
-  (time (solve 12))
+  (time (euler-088-atom 12000))
   )
