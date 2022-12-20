@@ -21,9 +21,8 @@
               (when (<= k limit)
                 (apply merge-with min {k product}
                        (for [i (iterate inc start)
-                             :let [next-product (* product i)]
-                             :while (<= next-product (* 2 limit))]
-                         (map-loop next-product (+ sum i) (inc count) i))))))]
+                             :while (<= (* product i) (* 2 limit))]
+                         (map-loop (* product i) (+ sum i) (inc count) i))))))]
     (apply + (-> (map-loop 1 1 1 2) (dissoc 1) vals set))))
 
 (comment
