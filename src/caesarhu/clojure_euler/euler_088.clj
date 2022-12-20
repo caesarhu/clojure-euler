@@ -1,5 +1,4 @@
-(ns caesarhu.clojure-euler.euler-088
-  (:require [caesarhu.math.primes :as p]))
+(ns caesarhu.clojure-euler.euler-088)
 
 (defn product-loop
   [limit result-map]
@@ -22,6 +21,23 @@
          set
          (apply +))))
 
+(defn euler-088
+  [limit]
+  (letfn [(map-loop
+           [m p s c start]
+           (let [k (+ p (- s) c)]
+             (if (> k limit) m
+               (apply merge-with min m {k p}
+                      (for [i (iterate inc start)
+                            :let [next-product (* p i)]
+                            :while (<= next-product (* 2 limit))]
+                        (map-loop m next-product (+ s i) (inc c) i))))))]
+    (apply + (-> (map-loop {} 1 1 1 2)
+                 (dissoc 1)
+                 vals
+                 set))))
+
 (comment
+  (time (euler-088 12000))
   (time (euler-088-atom 12000))
   )
