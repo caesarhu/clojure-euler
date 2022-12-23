@@ -35,11 +35,12 @@
 
 (defn euler-091
   [limit]
-  (let [c (* 3 (* limit limit))]
-    (reduce + c (for [x1 (range 1 (inc limit))
-                      y1 (range 1 (inc limit))
-                      :let [p (gcd x1 y1)]]
-                  (* 2 (min (quot (* p x1) y1) (quot (* p (- limit y1)) x1)))))))
+  (reduce +
+          (* 3 limit limit)
+          (for [x (range 1 (inc limit))
+                y (range 1 (inc limit))
+                :let [p (gcd x y)]]
+            (* 2 (min (quot (* p x) y) (quot (* p (- limit y)) x))))))
 
 (comment
   (time (brute-force 50))
