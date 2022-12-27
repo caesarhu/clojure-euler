@@ -1,8 +1,9 @@
 (ns caesarhu.clojure-euler.euler-095
-  (:require [caesarhu.math.cycle-detection :refer [floyd-cycle? floyd-detection]]))
+  (:require [caesarhu.math.cycle-detection :refer [floyd-cycle? floyd-detection]]
+            [clojure.core.reducers :as r]))
 
 (defn generate-sum-map
-  [limit]
+  [^long limit]
   (let [m (apply merge (for [i (range 2 (inc limit))]
                          {i 1}))]
     (->> (for [i (iterate inc 2)
@@ -32,7 +33,6 @@
          (filter some?)
          (apply max-key last))))
 
-(comment
-  (time (generate-sum-map 1000000))
+(comment 
   (time (euler-095 1000000))
   )
