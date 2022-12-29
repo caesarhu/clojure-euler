@@ -13,7 +13,8 @@
                         :git/sha "dfdd610"}
         aysylu/loom {:mvn/version "1.0.2"}
         org.clojure/core.cache {:mvn/version "1.0.225"}
-        org.clojure/core.memoize {:mvn/version "1.0.257"}}
+        org.clojure/core.memoize {:mvn/version "1.0.257"}
+        sicmutils/sicmutils {:mvn/version "0.22.0"}}
  :aliases
  {:build {:deps {io.github.seancorfield/build-clj
                  {:git/tag "v0.9.0" :git/sha "d758807"}}
