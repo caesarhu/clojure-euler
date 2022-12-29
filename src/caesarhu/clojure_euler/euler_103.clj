@@ -1,6 +1,5 @@
 (ns caesarhu.clojure-euler.euler-103
-  (:require [clojure.math.combinatorics :as combo]
-            [clojure.set :as set]))
+  (:require [clojure.math.combinatorics :as combo]))
 
 (defn distinct-sum?
   [v]
@@ -9,12 +8,12 @@
 (defn special-set?
   [s]
   (let [length (count s)
-        half (+ (quot length 2) (mod length 2))]
-    (and (->> (for [i (range 2 (inc half))
+        sorted (sort s)]
+    (and (->> (for [i (range 2 (inc (/ length 2)))
                     :let [j (dec i)]]
-                [(apply + (take i s)) 
-                 (apply + (take-last j s))])
-              (every? #(apply > %)))
+                (> (apply + (take i sorted))
+                   (apply + (take-last j sorted))))
+              (every? true?))
          (->> (for [i (range 2 (inc (quot length 2)))]
                 (combo/combinations s i))
               (every? distinct-sum?)))))
@@ -36,5 +35,5 @@
       (recur (next-set result)))))
 
 (comment
-  (time (euler-103 7))
+  (time (euler-103 8))
   )

@@ -11,12 +11,12 @@
 (defn special-set?
   [s]
   (let [length (count s)
-        half (+ (quot length 2) (mod length 2))]
-    (and (->> (for [i (range 2 (inc half))
+        sorted (sort s)]
+    (and (->> (for [i (range 2 (inc (/ length 2)))
                     :let [j (dec i)]]
-                [(apply + (take i s))
-                 (apply + (take-last j s))])
-              (every? #(apply > %)))
+                (> (apply + (take i sorted))
+                   (apply + (take-last j sorted))))
+              (every? true?))
          (->> (for [i (range 2 (inc (quot length 2)))]
                 (combo/combinations s i))
               (every? distinct-sum?)))))
@@ -29,8 +29,9 @@
        (map (fn [v]
               (map #(Long/parseLong %) v)))
        (filter special-set?)
-       count))
+       (map #(apply + %))
+       (apply +)))
 
 (comment
-  (euler-105)
+  (time (euler-105))
   )

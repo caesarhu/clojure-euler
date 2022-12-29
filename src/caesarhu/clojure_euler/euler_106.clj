@@ -1,5 +1,4 @@
-(ns caesarhu.clojure-euler.euler-106
-  (:require [clojure.math.combinatorics :as combo]))
+(ns caesarhu.clojure-euler.euler-106)
 
 (defn binomial
   [n k]
