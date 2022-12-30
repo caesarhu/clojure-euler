@@ -30,24 +30,16 @@
   [v]
   (->> v (map #(inc (* 2 %))) (apply *) (#(math/ceil (/ % 2))) int))
 
-(defn append-vector
-  [v x]
-  (let [length (count v)]
-    (assoc v length x)))
-
-(defn inc-vector
+(defn extend-vector
   [v]
   (let [v0 (vec (cons (inc (first v)) (rest v)))
         v2 (vec (partition 2 1 v))]
-    (->> (for [i (range (count v2))
-               :let [[n1 n2] (v2 i)]
-               :when (> n1 n2)]
-           (assoc v (inc i) (inc n2)))
-         (cons v0))))
-
-(defn extend-vector
-  [v]
-  (concat (inc-vector v) [(append-vector v 1)]))
+    (concat [v0] 
+            (for [i (range (count v2))
+                       :let [[n1 n2] (v2 i)]
+                       :when (> n1 n2)]
+                   (assoc v (inc i) (inc n2)))
+            [(assoc v (count v) 1)])))
 
 (defn accept-result?
   [m limit]
