@@ -39,5 +39,5 @@
 
 (comment
   (take 50 fib-seq)
-  (time (euler-104 2))
+  (time (euler-104))
   )
