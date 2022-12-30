@@ -4,8 +4,8 @@
             [clojure.data.priority-map :refer [priority-map]]))
 
 (defn v->number
-  [s]
-  (->> (map #(math/expt %1 %2) (p/primes) s)
+  [v]
+  (->> (map #(math/expt %1 %2) (p/primes) v)
        (apply *')))
 
 (defn v->divisors
@@ -23,25 +23,23 @@
               (assoc v (inc i) (inc n2)))
             [(assoc v (count v) 1)])))
 
-(defn accept-result?
-  [m limit]
-  (let [[v1 d1] (last m)
-        [v2 d2] (->> m reverse (take-while #(> (last %) limit)) last)]
-    (and (> d1 limit) (>= (/ (count v1) (count v2)) 3/2))))
-
 (defn euler-110
   [limit]
-  (loop [m (priority-map [1] 2)]
-    (if (accept-result? m limit)
-      (->> m
-           reverse
-           (take-while #(> (last %) limit))
-           (map first)
-           (map v->number)
-           (apply min))
-      (recur (->> (mapcat extend-vector (keys m))
-                  (map #(hash-map % (v->divisors %)))
-                  (apply merge m))))))
+  (let [limit-over-log5 (-> (/ (Math/log10 limit) (Math/log10 5)) math/ceil int)
+        init-vector (vec (repeat limit-over-log5 1))
+        filter-limit (fn [m]
+                       (some->> m reverse
+                                (take-while #(> (last %) limit))
+                                not-empty
+                                (map first)))]
+    (loop [m (priority-map init-vector (v->divisors init-vector))]
+      (let [vs (filter-limit m)]
+        (if (some #(= limit-over-log5 (count %)) vs)
+          (->> (map #(vector (v->number %) %) vs)
+               (apply min-key first))
+          (recur (->> (mapcat extend-vector (keys m))
+                      (map #(hash-map % (v->divisors %)))
+                      (apply merge m))))))))
 
 (comment
   (time (euler-110 4000000))
