@@ -1,36 +1,30 @@
-(ns caesarhu.clojure-euler.euler-113
-  (:require [clojure.math.combinatorics :as combo]))
+(ns caesarhu.clojure-euler.euler-113)
 
-(def init-vector (map vec (combo/cartesian-product (range 10) (range 10))))
-(def init-map
-  (->> init-vector
-       (map (fn [[start end :as v]]
-              [v (sorted-map 1 (if (or (zero? start) (not= start end)) 0 1))]))
-       (into (sorted-map))))
+(def init-vector
+  (let [init (vec (repeat 10 (vec (repeat 10 0))))]
+    (reduce (fn [acc i]
+              (assoc-in acc [i i] 1))
+            init (range 0 10))))
 
-(defn next-key-map
-  [m k]
-  (let [[start end] k
-        step (if (pos? (- start end)) -1 1)
-        next-k (-> (m k) last first)
-        sum (apply + (for [i (range start (+ end step) step)]
-                       (get-in m [[start i] next-k])))]
-    (merge-with merge m {k {(inc next-k) sum}})))
-
-(defn next-map
-  [m]
-  (reduce (fn [acc k]
-            (next-key-map acc k))
-          m init-vector))
+(defn next-vector
+  [v]
+  (let [next-value (fn [[i j]]
+                     (apply + (-> v (nth i) (subvec i (inc j)))))]
+    (reduce (fn [acc [i j]]
+              (-> acc 
+                  (assoc-in [i j] (next-value [i j]))
+                  (assoc-in [j i] (next-value [i j]))))
+            v (for [i (range 10)
+                    j (range i 10)]
+                [i j]))))
 
 (defn euler-113
   [expt]
-  (let [m (nth (iterate next-map init-map) (dec expt))]
-    (->> m 
-         vals
-         (mapcat vals)
+  (let [vs (take expt (iterate next-vector init-vector))]
+    (->> (map #(drop 1 %) vs)
+         flatten
          (apply +))))
 
 (comment
-  (time (euler-113 100))
+  (time (euler-113 6))
   )
