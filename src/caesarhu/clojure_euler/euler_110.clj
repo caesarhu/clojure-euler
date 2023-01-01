@@ -1,16 +1,16 @@
 (ns caesarhu.clojure-euler.euler-110
   (:require [caesarhu.math.primes :as p]
-            [clojure.math.numeric-tower :as math]
+            [clojure.math.numeric-tower :refer [expt ceil]]
             [clojure.data.priority-map :refer [priority-map]]))
 
 (defn v->number
   [v]
-  (->> (map #(math/expt %1 %2) (p/primes) v)
+  (->> (map #(expt %1 %2) (p/primes) v)
        (apply *')))
 
 (defn v->divisors
   [v]
-  (->> v (map #(inc (* 2 %))) (apply *) (#(math/ceil (/ % 2))) int))
+  (->> v (map #(inc (* 2 %))) (apply *') (#(ceil (/ % 2)))))
 
 (defn extend-vector
   [v]
@@ -25,7 +25,7 @@
 
 (defn euler-110
   [limit]
-  (let [limit-over-log5 (-> (/ (Math/log10 limit) (Math/log10 5)) math/ceil int)
+  (let [limit-over-log5 (-> (/ (Math/log10 (* 2 limit)) (Math/log10 5)) ceil int)
         init-vector (vec (repeat limit-over-log5 1))
         filter-limit (fn [m]
                        (some->> m reverse
@@ -35,8 +35,7 @@
     (loop [m (priority-map init-vector (v->divisors init-vector))]
       (let [vs (filter-limit m)]
         (if (some #(= limit-over-log5 (count %)) vs)
-          (->> (map #(vector (v->number %) %) vs)
-               (apply min-key first))
+          [(v->number (last vs)) (last vs)]
           (recur (->> (mapcat extend-vector (keys m))
                       (map #(hash-map % (v->divisors %)))
                       (apply merge m))))))))
