@@ -9,7 +9,7 @@
 (defn next-vector
   [v]
   (let [next-value (fn [[i j]]
-                     (apply + (-> v (nth i) (subvec i (inc j)))))]
+                     (apply +' (-> v (nth i) (subvec i (inc j)))))]
     (reduce (fn [acc [i j]]
               (-> acc 
                   (assoc-in [i j] (next-value [i j]))
@@ -23,8 +23,8 @@
   (let [vs (take expt (iterate next-vector init-vector))]
     (->> (map #(drop 1 %) vs)
          flatten
-         (apply +))))
+         (apply +'))))
 
 (comment
-  (time (euler-113 6))
+  (time (euler-113 100))
   )
