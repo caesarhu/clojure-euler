@@ -17,7 +17,7 @@
 
 (defn filter-partitions
   [digit-set]
-  (->> (combo/partitions (range 1 10))
+  (->> (combo/partitions (range 1 10) :min 2 :max 6)
        (filter (fn [v]
                  (every? #(digit-set (set %)) v)))))
 
