@@ -44,8 +44,7 @@
        first
        (apply +)))
 
-(comment 
-  (peek [1 2 3])
-  (time (euler-122 500))
-  (time (euler-122-atom 500))
+(comment
+  (time (euler-122 200))
+  (time (euler-122-atom 200))
   )
