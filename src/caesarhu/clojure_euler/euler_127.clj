@@ -12,27 +12,25 @@
             px (iterate #(+ p %) p)
             :while (< px limit)]
       (swap! rad update px * p))
-    (reduce (fn [acc i]
-              (conj acc [i (@rad i)]))
-            (priority-map) (range 1 limit))))
+    (->> (range 1 limit)
+         (map #(vector % (@rad %)))
+         (into (priority-map)))))
 
 (defn abc-hits
   [limit]
   (let [m (rad-map limit)
         valid-ab (fn [c x]
-                   (let [y (- c x)]
-                     (if (and (coprime? c x) (< (apply * (map m [x y c])) c))
-                       [x y]
-                       [])))
+                   (let [y (- c x)
+                         upper-bound (/ c (* (m x) (m c)))]
+                     (when (and (< x c) (coprime? (m c) (m x)) (< 1 (m y) upper-bound))
+                       (sorted-set x y c))))
         valid-c (fn [c]
                   (when-let [qc (as-> (/ c (m c)) q (when (> q 2) q))]
                     (->> (subseq m < (sqrt qc))
                          (map first)
-                         (filter #(< % c))
-                         (mapcat #(valid-ab c %))
-                         (apply sorted-set)
-                         (#(subseq % < (/ c 2)))
-                         (map #(vector % (- c %) c)))))]
+                         (map #(valid-ab c %))
+                         (remove nil?)
+                         set)))]
     (mapcat valid-c (range 1 limit))))
 
 (defn euler-127
@@ -42,5 +40,7 @@
        (apply +)))
 
 (comment
-  (time (euler-127 120000))
+  (subseq (->> (map vector (range 10) (range 10))
+               (into (sorted-map))) < 5)
+  (time (->> (euler-127 120000)))
   )
