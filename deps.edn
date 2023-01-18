@@ -6,8 +6,8 @@
                               :git/tag "v0.1.19"
                               :git/sha "0592d98"}
         caesarhu.math/math-tools {:git/url "https://github.com/caesarhu/math-tools"
-                                  :git/tag "v0.1.20"
-                                  :git/sha "0e7f034"}
+                                  :git/tag "v0.1.23"
+                                  :git/sha "74c71c4"}
         caesarhu/kuafu {:git/url "https://github.com/caesarhu/kuafu"
                         :git/tag "v0.1.34"
                         :git/sha "dfdd610"}
@@ -18,7 +18,7 @@
         sicmutils/sicmutils {:mvn/version "0.22.0"}}
  :aliases
  {:build {:deps {io.github.seancorfield/build-clj
-                 {:git/tag "v0.9.0" :git/sha "d758807"}}
+                 {:git/tag "v0.9.1" :git/sha "831c70f"}}
           :ns-default build}
   :test {:extra-paths ["test"]
          :extra-deps {org.clojure/test.check {:mvn/version "1.1.1"}

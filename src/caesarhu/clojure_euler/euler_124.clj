@@ -30,5 +30,6 @@
             (sort-by last)) (- target 2)))
 
 (comment
+  (factors-range 40)
   (time (euler-124 100000 10000))
   )
