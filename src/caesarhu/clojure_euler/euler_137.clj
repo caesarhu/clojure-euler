@@ -1,4 +1,5 @@
-(ns caesarhu.clojure-euler.euler-137)
+(ns caesarhu.clojure-euler.euler-137
+  (:require [clojure.math.numeric-tower :refer [expt]]))
 
 (def fib-seq
   ((fn fib [a b]
@@ -14,6 +15,7 @@
   [target]
   (nth golden-nugget (dec target)))
 
+
 (comment
-  (euler-137 15)
+  (euler-137 13)
   )
