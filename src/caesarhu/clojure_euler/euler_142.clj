@@ -55,25 +55,14 @@
 (defn match-squares
   [limit]
   (let [triplet-map (->> (pythagorean limit)
-                         (map #(hash-map (last %) [%]))
+                         (map #(hash-map (last %) [(take 2 %)]))
                          (apply merge-with concat))]
-    (->> (for [[f v] triplet-map]
-           (let [ds (->> (mapcat #(take 2 %) v) set)]
-             (for [e (seq ds)
-                   :when (triplet-map e)
-                   te (triplet-map e)
-                   d (take 2 te)
-                   :when (ds d)
-                   :let [c (sqrt (- (square f) (square d)))]
-                   :when (triplet-map c)
-                   tc (triplet-map c)
-                   :let [b (first (set/intersection (set te) (set tc)))]
-                   :when b
-                   :let [a (sqrt (- (square c) (square b)))]
-                   :when (and (> d a)
-                              (even? (- (square d) (square a))))]
-               [a b c d e f])))
-         (apply concat))))
+    (for [[f v] triplet-map
+          :let [ds (->> v (apply concat) set)]
+          [a e] v
+          [b d] (triplet-map e)
+          :when (and (ds d) (> d a) (even? (- (square d) (square a))))]
+      [a b (sqrt (+ (square a) (square b))) d e f])))
 
 (defn euler-142
   [limit]
