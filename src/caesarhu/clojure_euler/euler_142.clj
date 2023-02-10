@@ -86,5 +86,5 @@
        sort))
 
 (comment
-  (time (euler-142 10000))
+  (time (euler-142 30000))
   )
