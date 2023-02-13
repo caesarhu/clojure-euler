@@ -36,30 +36,34 @@
     r))
 
 (defn prime-residues
-  []
-  (let [primes (take 6 (p/primes))
-        pr (map #(vector % (filter-residues %)) primes)
-        pr2 (for [[p rv] pr]
-              [p (->> (for [r rv]
-                        (if (zero? r) r
-                            (cipolla r p)))
-                      flatten
-                      (map long))])]
-    [(map first pr2)
-     (->> (map last pr2)
-          (apply cartesian-product))]))
+  [limit]
+  (let [pr (->> (p/primes limit)
+                (map #(vector % (filter-residues %)))
+                (map (fn [[p rv]]
+                       [p (->> (map #(if (zero? %) % (cipolla % p)) rv)
+                               flatten
+                               (map long))])))
+        [pr-head pr-tail] (split-at 6 pr)
+         primes (map first pr-head)]
+    [[(apply *' primes)
+      (->> (map last pr-head)
+           (apply cartesian-product)
+           (map #(crt primes %))
+           sort)]
+     (->> pr-tail
+          (map #(vector (first %) (into #{} (last %))))
+          (into {}))]))
 
 (defn euler-146
   [limit]
-  (let [[primes rv] (prime-residues)
-        rv (->> (map #(crt primes %) rv) sort)]
+  (let [[[step rv] m] (prime-residues 80)]
     (->> (range)
-         (map #(apply *' % primes))
+         (map #(*' % step))
          (mapcat #(map (partial +' %) rv))
          (take-while #(< % limit))
+         (filter (fn [n] (every? (fn [[p s]] (s (mod n p))) m)))
          (filter valid?)
-         ((fn [v]
-            [(apply + v) v])))))
+         ((fn [v] [(apply +' v) v])))))
 
 (comment
   (time (euler-146 (* 150 1000000)))
