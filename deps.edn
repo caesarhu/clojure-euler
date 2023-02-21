@@ -16,6 +16,7 @@
         org.clojure/data.priority-map {:mvn/version "1.1.0"}
         org.clojure/core.cache {:mvn/version "1.0.225"}
         org.clojure/core.memoize {:mvn/version "1.0.257"}
+        net.cgrand/xforms {:mvn/version "0.19.4"}
         sicmutils/sicmutils {:mvn/version "0.23.0"}}
  :aliases
  {:build {:deps {io.github.seancorfield/build-clj
