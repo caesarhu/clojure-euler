@@ -1,7 +1,5 @@
 (ns caesarhu.clojure-euler.euler-150
-  (:require [clojure.math.numeric-tower :refer [expt]]
-            [net.cgrand.xforms :as x]
-            [net.cgrand.xforms.rfs :as rf]))
+  (:require [clojure.math.numeric-tower :refer [expt]]))
 
 (def sk-vector
   (let [base (expt 2 20)]
@@ -9,53 +7,33 @@
          rest
          (map #(- % (expt 2 19))))))
 
-(defn sum-triangle
+(defn sk-triangle
   [rows]
   (->> (reduce (fn [[acc sk] i]
                  (let [[head tail] (split-at i sk)]
                    [(conj acc (vec head)) tail]))
                [[] sk-vector] (range 1 (inc rows)))
-       first
-       (map #(->> (reductions + %) vec))
-       vec))
+       first))
 
 (defn euler-150
-  [rows]
-  (let [origin (sum-triangle rows)
-        value (fn [[i j]] (if-let [v (get-in origin [i j])] v 0))
-        min-triangle (fn [[i j]]
-                       (->> (for [x (range i rows)]
-                              (let [y0 j
-                                    y1 (- x (- i j))]
-                                (- (value [x y1]) (value [x (dec y0)]))))
-                            (reductions +)
-                            (apply min)))]
-    (->> (for [i (range rows)
-               j (range (inc i))]
-           (min-triangle [i j]))
-         (apply min))))
-
-(defn euler-150-xforms
-  [rows]
-  (let [origin (sum-triangle rows)
-        value (fn [[i j]] (if-let [v (get-in origin [i j])] v 0))
-        min-triangle (fn [[i j]]
-                       (transduce (comp
-                                   (map (fn [x]
-                                          (let [y0 j
-                                                y1 (- x (- i j))]
-                                            (- (value [x y1]) (value [x (dec y0)])))))
-                                   (x/reductions +))
-                                  rf/min
-                                  (range i rows)))]
-    (transduce (comp
-                (mapcat (fn [i]
-                          (map #(vector i %) (range (inc i)))))
-                (map min-triangle))
-               rf/min
-               (range rows))))
+  [limit]
+  (let [triangle (sk-triangle limit)
+        next-map-row (fn [map-row]
+                       (let [i (- (count map-row) 2)]
+                         (into []
+                               (map (fn [j]
+                                      (let [value (get-in triangle [i j])
+                                            right (map + (repeat value) (:right (map-row (inc j))))]
+                                        {:all (->> (map + right (:all (map-row j))) (cons value) vec)
+                                         :right (->> right (cons value) vec)})))
+                               (range (inc i)))))]
+    (loop [map-row (next-map-row (vec (repeat (inc limit) [])))
+           result (apply min (last triangle))]
+      (if (= 1 (count map-row))
+        result
+        (let [mp (next-map-row map-row)]
+          (recur mp (apply min result (mapcat :all mp))))))))
 
 (comment
   (time (euler-150 1000))
-  (time (euler-150-xforms 1000))
   )
