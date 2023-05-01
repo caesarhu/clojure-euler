@@ -1,11 +1,6 @@
 (ns user
-  (:require [portal.api :as p]
-            [clojure.java.shell :as sh]
-            [clojure.string :as str]))
+  (:require [dev.nu.morse :as morse]))
 
 (comment
-  (def p (p/open))
-  (add-tap #'p/submit)
-  (tap> :hello)
-  (sh/sh "hostname" "-f")
+  (morse/launch-in-proc)
   )
