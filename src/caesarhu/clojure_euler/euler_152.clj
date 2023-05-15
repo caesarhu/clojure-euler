@@ -1,6 +1,5 @@
 (ns caesarhu.clojure-euler.euler-152
   (:require [caesarhu.math.math-tools :as mt]
-            [clojure.math.numeric-tower :refer [expt]]
             [clojure.set :as set]
             [caesarhu.math.primes :as p]
             [clojure.math.combinatorics :as combo]))
@@ -9,60 +8,60 @@
 
 (defn square-sum
   [s]
-  (if (empty? s)
-    [0 0 0]
-    (let [lcm (apply mt/lcm* s)
-          n (->> (map #(quot lcm %) s)
-                 (map square)
-                 (apply +))]
-      [n (square lcm) (/ n (square lcm))])))
+  (let [lcm (apply mt/lcm* s)
+        n (->> (map #(quot lcm %) s)
+               (map square)
+               (apply +))]
+    [n (square lcm)]))
 
-(defn gen-seq
-  [n illegal]
-  (->> (range 1 (inc n))
-       (filter #(mt/coprime? illegal %))
-       (combo/subsets)))
+(defn inverse-sq
+  [s]
+  (apply / (square-sum s)))
 
-(defn prime-sets
-  ([limit p]
-   (prime-sets limit p 1))
-  ([limit p illegal]
-   (let [pp (->> (or ({2 3 3 2} p) 1) (expt p))
-         n (quot limit pp)]
-     (->> (drop 2 (gen-seq n illegal))
-          (map #(map (partial * pp) %))
-          (filter #(zero? (mod (first (square-sum %)) (square p))))))))
+(defn gen-seq-map
+  [limit]
+  (let [n (quot limit 5)
+        primes (p/primes 5 (inc n))
+        raw-map (->> (drop 2 (combo/subsets (range 1 (inc n))))
+                     (map #(vector (square-sum %) %))
+                     (mapcat (fn [[[n d] s]]
+                               (when-let [valid (->> (filter (fn [p] (every? #(<= (* p %) limit) s)) primes)
+                                                     (filter #(zero? (mod n (square %))))
+                                                     not-empty)]
+                                 (map #(hash-map % [(map (partial * %) s)]) valid))))
+                     (apply merge-with concat))
+        invalid (apply * 1 (set/difference (set primes) (set (keys raw-map))))]
+    (reduce (fn [m k]
+              (update m k (fn [ss] (filter (fn [s] (every? #(mt/coprime? invalid %) s)) ss))))
+            raw-map (keys raw-map))))
 
 (defn euler-152
   [limit]
-  (let [[valid invalid] (vals (group-by #(some? (first (prime-sets limit %)))
-                                        (p/primes (inc (quot limit 5)))))
-        target (->> (p/divisors (* 2 2 3)) rest combo/subsets rest
-                    (map #(hash-map (last (square-sum %)) %))
-                    (apply merge))
+  (let [seq-map (gen-seq-map limit)
+        target (->> (p/divisors (* 2 2 2 3 3)) rest (filter #(<= % limit))
+                    combo/subsets rest
+                    (map #(hash-map (inverse-sq %) [%]))
+                    (apply merge-with concat))
         match-target (fn [s]
-                       (when-let [ans (->> (last (square-sum s)) (- 1/2) target)]
-                         (concat ans s)))
-        illegal (apply * 1 invalid)]
-    (loop [[prime & more] (reverse valid)
+                       (when-let [ans (->> (inverse-sq s) (- 1/2) target)]
+                         (map #(concat % s) ans)))]
+    (loop [[prime & more] (-> (keys seq-map) sort reverse)
            legal 1
            result [[]]]
       (if (nil? prime)
-        (->> (map match-target result)
-             (remove nil?)
+        (->> (mapcat match-target (rest result))
              (map set)
              (into #{})
              count)
-        (recur more
-               (if (>= prime 5)
-                 (* legal prime)
-                 legal)
-               (->> (combo/cartesian-product (cons [] (prime-sets limit prime illegal)) result)
-                    (map #(distinct (apply concat %)))
-                    (filter #(or (empty? %)
-                                 (mt/coprime? legal (-> (square-sum %) last denominator))))))))))
+        (let [new-legal (* prime legal)]
+          (recur more
+                 new-legal
+                 (sequence (comp
+                            (map #(distinct (apply concat %)))
+                            (filter #(or (empty? %)
+                                         (mt/coprime? new-legal (denominator (inverse-sq %))))))
+                           (combo/cartesian-product (cons [] (seq-map prime)) result))))))))
 
 (comment
-  (->> (prime-sets 80 7))
-  (time (euler-152 100))
+  (time (euler-152 80))
   )

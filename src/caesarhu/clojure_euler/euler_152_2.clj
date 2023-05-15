@@ -1,6 +1,5 @@
 (ns caesarhu.clojure-euler.euler-152-2
   (:require [caesarhu.math.math-tools :refer [coprime?]]
-            [net.cgrand.xforms :as x]
             [clojure.math.combinatorics :refer [subsets cartesian-product]]
             [caesarhu.math.primes :as p]))
 
@@ -18,7 +17,7 @@
   ([limit prime]
    (prime-sets limit prime 1))
   ([limit prime illegal]
-   (eduction (comp
+   (sequence (comp
               (map #(map (partial * prime) %))
               (filter #(coprime? (denominator (inverse-sq %)) prime)))
              (drop 2 (gen-seq (quot limit prime) illegal)))))
@@ -41,14 +40,14 @@
       (if (nil? prime)
         (->> (mapcat match-target result)
              (map set)
-             (into #{})
+             set
              count)
         (recur more
                (* legal prime)
-               (eduction (comp
+               (sequence (comp
                           (map #(distinct (apply concat %)))
                           (filter #(or (empty? %)
-                                       (coprime? legal (denominator (inverse-sq %))))))
+                                       (coprime? (* legal prime) (denominator (inverse-sq %))))))
                          (cartesian-product (cons [] (prime-sets limit prime illegal))
                                             result)))))))
 
