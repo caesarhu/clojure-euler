@@ -20,21 +20,22 @@
 
 (defn euler-151
   [papers]
-  (loop [result []
+  (loop [result 0
          prob-papers [[1 papers]]]
     (if (empty? prob-papers)
-      (->> (map first result)
-           (apply +)
-           (* 1000000)
+      (->> (* 1000000 result)
            round
            (* 1/1000000)
            double)
-      (recur (concat result (filter (fn [[_ papers]]
-                                      (and (= 1 (reduce + papers))
-                                           (not= 1 (count papers))))
-                                    prob-papers))
-             (apply concat (map expand-papers prob-papers))))))
+      (let [[f & other] prob-papers
+            current (expand-papers f)]
+        (recur (apply + result (->> (filter (fn [[_ papers]]
+                                              (and (= 1 (reduce + papers))
+                                                   (not= 1 (count papers))))
+                                            current)
+                                    (map first)))
+               (concat current other))))))
 
 (comment
-  (time (euler-151 [1 1 1 1]))
+  (time (euler-151 [1 0 0 0 0]))
   )
