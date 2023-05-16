@@ -1,66 +1,55 @@
 (ns caesarhu.clojure-euler.euler-152
-  (:require [caesarhu.math.math-tools :as mt]
-            [clojure.set :as set]
-            [caesarhu.math.primes :as p]
-            [clojure.math.combinatorics :as combo]))
-
-(defn square [n] (* n n))
-
-(defn square-sum
-  [s]
-  (let [lcm (apply mt/lcm* s)
-        n (->> (map #(quot lcm %) s)
-               (map square)
-               (apply +))]
-    [n (square lcm)]))
+  (:require [caesarhu.math.math-tools :refer [coprime?]]
+            [clojure.math.combinatorics :refer [subsets cartesian-product]]
+            [caesarhu.math.primes :as p]))
 
 (defn inverse-sq
   [s]
-  (apply / (square-sum s)))
+  (transduce (map #(/ (* % %))) + s))
 
-(defn gen-seq-map
-  [limit]
-  (let [n (quot limit 5)
-        primes (p/primes 5 (inc n))
-        raw-map (->> (drop 2 (combo/subsets (range 1 (inc n))))
-                     (map #(vector (square-sum %) %))
-                     (mapcat (fn [[[n d] s]]
-                               (when-let [valid (->> (filter (fn [p] (every? #(<= (* p %) limit) s)) primes)
-                                                     (filter #(zero? (mod n (square %))))
-                                                     not-empty)]
-                                 (map #(hash-map % [(map (partial * %) s)]) valid))))
-                     (apply merge-with concat))
-        invalid (apply * 1 (set/difference (set primes) (set (keys raw-map))))]
-    (reduce (fn [m k]
-              (update m k (fn [ss] (filter (fn [s] (every? #(mt/coprime? invalid %) s)) ss))))
-            raw-map (keys raw-map))))
+(defn gen-seq
+  [n illegal]
+  (->> (range 1 (inc n))
+       (filter #(coprime? illegal %))
+       (subsets)))
+
+(defn prime-sets
+  ([limit prime]
+   (prime-sets limit prime 1))
+  ([limit prime illegal]
+   (sequence (comp
+              (map #(map (partial * prime) %))
+              (filter #(coprime? (denominator (inverse-sq %)) prime)))
+             (drop 2 (gen-seq (quot limit prime) illegal)))))
 
 (defn euler-152
   [limit]
-  (let [seq-map (gen-seq-map limit)
+  (let [[valid invalid] (vals (group-by #(some? (first (prime-sets limit %)))
+                                        (p/primes 5 (inc (quot limit 5)))))
         target (->> (p/divisors (* 2 2 2 3 3)) rest (filter #(<= % limit))
-                    combo/subsets rest
+                    subsets rest
                     (map #(hash-map (inverse-sq %) [%]))
                     (apply merge-with concat))
         match-target (fn [s]
                        (when-let [ans (->> (inverse-sq s) (- 1/2) target)]
-                         (map #(concat % s) ans)))]
-    (loop [[prime & more] (-> (keys seq-map) sort reverse)
+                         (map #(concat % s) ans)))
+        illegal (apply * 1 invalid)]
+    (loop [[prime & more] (reverse valid)
            legal 1
            result [[]]]
       (if (nil? prime)
-        (->> (mapcat match-target (rest result))
+        (->> (mapcat match-target result)
              (map set)
-             (into #{})
+             set
              count)
-        (let [new-legal (* prime legal)]
-          (recur more
-                 new-legal
-                 (sequence (comp
-                            (map #(distinct (apply concat %)))
-                            (filter #(or (empty? %)
-                                         (mt/coprime? new-legal (denominator (inverse-sq %))))))
-                           (combo/cartesian-product (cons [] (seq-map prime)) result))))))))
+        (recur more
+               (* legal prime)
+               (sequence (comp
+                          (map #(distinct (apply concat %)))
+                          (filter #(or (empty? %)
+                                       (coprime? (* legal prime) (denominator (inverse-sq %))))))
+                         (cartesian-product (cons [] (prime-sets limit prime illegal))
+                                            result)))))))
 
 (comment
   (time (euler-152 80))
