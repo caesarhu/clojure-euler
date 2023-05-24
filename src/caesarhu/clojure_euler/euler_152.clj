@@ -1,7 +1,8 @@
 (ns caesarhu.clojure-euler.euler-152
   (:require [caesarhu.math.math-tools :refer [coprime?]]
             [clojure.math.combinatorics :refer [subsets cartesian-product]]
-            [caesarhu.math.primes :as p]))
+            [caesarhu.math.primes :as p]
+            [clojure.set :as set]))
 
 (defn inverse-sq
   [s]
@@ -33,15 +34,14 @@
         match-target (fn [s]
                        (when-let [ans (->> (inverse-sq s) (- 1/2) target)]
                          (map #(concat % s) ans)))
-        illegal (apply * 1 invalid)]
+        illegal (apply * 1 invalid)
+        result (atom #{})]
     (loop [[prime & more] (reverse valid)
            legal 1
-           result [[]]]
+           raw-sets [[]]]
       (if (nil? prime)
-        (->> (mapcat match-target result)
-             (map set)
-             set
-             count)
+        (doseq [seq (mapcat match-target raw-sets)]
+          (swap! result #(conj % (set seq))))
         (recur more
                (* legal prime)
                (sequence (comp
@@ -49,8 +49,10 @@
                           (filter #(or (empty? %)
                                        (coprime? (* legal prime) (denominator (inverse-sq %))))))
                          (cartesian-product (cons [] (prime-sets limit prime illegal))
-                                            result)))))))
+                                            raw-sets)))))
+    (count target)))
 
 (comment
+  (->> (prime-sets 80 9))
   (time (euler-152 80))
   )
