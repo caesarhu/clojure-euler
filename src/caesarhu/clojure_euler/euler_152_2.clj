@@ -14,12 +14,6 @@
   [s]
   (apply +' (map #(square (quot @LCM %)) s)))
 
-(defn sum-denominator
-  [[sum s]]
-  (let [lcm2 (square @LCM)
-        g (gcd* sum lcm2)]
-    (quot lcm2 g)))
-
 (defn valid?
   [s p]
   (let [n (sum-numerator s)
@@ -87,5 +81,5 @@
 
 (comment
   (power-seq 140)
-  (time (euler-152 100))
+  (time (euler-152 110))
   )
