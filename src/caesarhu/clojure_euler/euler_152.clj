@@ -1,58 +1,74 @@
 (ns caesarhu.clojure-euler.euler-152
-  (:require [caesarhu.math.math-tools :refer [coprime?]]
-            [clojure.math.combinatorics :refer [subsets cartesian-product]]
-            [caesarhu.math.primes :as p]
-            [clojure.set :as set]))
+  (:require [caesarhu.math.primes :as p]
+            [clojure.math.numeric-tower :refer [expt]]
+            [caesarhu.math.math-tools :refer [lcm* gcd*]]
+            [clojure.math.combinatorics :refer [subsets cartesian-product]]))
 
-(defn inverse-sq
-  [s]
-  (transduce (map #(/ (* % %))) + s))
+(defn sum-numerator
+  ([s lcm]
+   (apply +' (map #(as-> (quot lcm %) n (*' n n)) s)))
+  ([s]
+   (sum-numerator s (apply lcm* s))))
 
-(defn gen-seq
-  [n illegal]
-  (->> (range 1 (inc n))
-       (filter #(coprime? illegal %))
-       (subsets)))
-
-(defn prime-sets
-  ([limit prime]
-   (prime-sets limit prime 1))
-  ([limit prime illegal]
-   (sequence (comp
-              (map #(map (partial * prime) %))
-              (filter #(coprime? (denominator (inverse-sq %)) prime)))
-             (drop 2 (gen-seq (quot limit prime) illegal)))))
+(defn prime-and-power
+  [limit]
+  (let [ps (p/primes (inc (quot limit 3)))
+        valid? (fn [p pp]
+                 (let [p2 (*' p p)]
+                   (->> (subsets (range 1 (inc (quot limit pp))))
+                        (drop-while #(< (count %) 2))
+                        (map sum-numerator)
+                        (some #(zero? (mod % p2))))))
+        powers (fn [p]
+                 (->> (map #(vector p (expt p %)) (rest (range)))
+                      (map #(and (apply valid? %) %))
+                      (take-while some?)
+                      (map last)))]
+    (->> (map powers ps)
+         (filter not-empty))))
 
 (defn euler-152
   [limit]
-  (let [[valid invalid] (vals (group-by #(some? (first (prime-sets limit %)))
-                                        (p/primes 5 (inc (quot limit 5)))))
-        target (->> (p/divisors (* 2 2 2 3 3)) rest (filter #(<= % limit))
-                    subsets rest
-                    (map #(hash-map (inverse-sq %) [%]))
-                    (apply merge-with concat))
-        match-target (fn [s]
-                       (when-let [ans (->> (inverse-sq s) (- 1/2) target)]
-                         (map #(concat % s) ans)))
-        illegal (apply * 1 invalid)
-        result (atom #{})]
-    (loop [[prime & more] (reverse valid)
-           legal 1
-           raw-sets [[]]]
-      (if (nil? prime)
-        (doseq [seq (mapcat match-target raw-sets)]
-          (swap! result #(conj % (set seq))))
-        (recur more
-               (* legal prime)
-               (sequence (comp
-                          (map #(distinct (apply concat %)))
-                          (filter #(or (empty? %)
-                                       (coprime? (* legal prime) (denominator (inverse-sq %))))))
-                         (cartesian-product (cons [] (prime-sets limit prime illegal))
-                                            raw-sets)))))
-    (count target)))
+  (let [pp-seq (prime-and-power limit)
+        lcm (apply *' (map last pp-seq))
+        target (quot (*' lcm lcm) 2)
+        target-map (->> (subsets (first pp-seq))
+                        (map #(vector (- target (sum-numerator % lcm)) %))
+                        (into {}))
+        gen-pp-map (fn [pp md]
+                     (let [p (first (p/factors pp))
+                           pp-lcm (->> (take-while #(<= (first %) p) pp-seq)
+                                       (map last)
+                                       (apply *'))]
+                       (->> (p/divisors pp-lcm)
+                            (filter #(and (<= % limit) (= pp (gcd* (expt p 6) %))))
+                            subsets
+                            (map #(vector (sum-numerator % lcm) %))
+                            (map #(hash-map (mod (first %) (*' md md)) [%]))
+                            (apply merge-with concat))))]
+    (loop [pps (->> (mapcat #(map vector % (reverse %)) (rest pp-seq))
+                    reverse)
+           result [[0 []]]]
+      (if (empty? pps)
+        (->> (map (fn [[sum s]]
+                    (when-let [t (target-map sum)]
+                      (concat s t)))
+                  result)
+             (remove nil?)
+             count)
+        (let [[pp md] (first pps)
+              m (gen-pp-map pp md)
+              new-result (mapcat (fn [[sum s]]
+                                   (let [dm (*' md md)
+                                         r (mod sum dm)
+                                         dr (if (zero? r) 0 (- dm r))]
+                                     (when-let [ps (m dr)]
+                                       (->> (cartesian-product [[sum s]] ps)
+                                            (map (fn [ss] [(apply +' (map first ss))
+                                                           (apply concat (map last ss))]))))))
+                                 result)]
+          (recur (rest pps) new-result))))))
 
 (comment
-  (->> (prime-sets 80 9))
-  (time (euler-152 80))
+  (time (euler-152 100))
   )
