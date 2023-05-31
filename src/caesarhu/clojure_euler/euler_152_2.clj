@@ -32,7 +32,8 @@
      :limit limit
      :pp-seq pp-seq
      :primes (map first pp-seq)
-     :target-set (->> (subsets (first pp-seq))
+     :target-set (->> (first pp-seq)
+                      subsets
                       (map #(- target (sum-numerator % lcm)))
                       (into #{}))}))
 
@@ -77,19 +78,7 @@
              (apply +))
         (recur (rest pp-list) (match-pp info-map (first pp-list) result))))))
 
-(defn euler-152-3
-  [limit]
-  (let [info-map (gen-info-map limit)
-        {:keys [pp-seq target-set]} info-map]
-    (loop [pp-list (->> (mapcat #(map vector % (reverse %)) (rest pp-seq))
-                        reverse)
-           result {0 1}]
-      (if (empty? pp-list)
-        (->> (filter #(target-set (first %)) result)
-             (map last)
-             (apply +))
-        (recur (rest pp-list) (match-pp info-map (first pp-list) result))))))
-
 (comment
-  (time (euler-152-2 200))
+  (gen-info-map 80)
+  (time (euler-152-2 140))
   )
