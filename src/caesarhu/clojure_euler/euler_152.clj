@@ -70,5 +70,5 @@
           (recur (rest pps) new-result))))))
 
 (comment
-  (time (euler-152 100))
+  (time (euler-152 80))
   )
