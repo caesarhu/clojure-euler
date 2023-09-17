@@ -29,5 +29,5 @@
        (* 2 (sigma-nature (quot limit 2))))))
 
 (comment
-  (time (euler-153 100000000))
+  (time (euler-153 (math/expt 10 8)))
   )

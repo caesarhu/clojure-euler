@@ -1,8 +1,9 @@
 (ns caesarhu.clojure-euler.euler-152-2
   (:require [caesarhu.math.primes :as p]
             [clojure.math.numeric-tower :refer [expt]]
-            [caesarhu.math.math-tools :refer [lcm* gcd*]]
-            [clojure.math.combinatorics :refer [subsets cartesian-product]]))
+            [caesarhu.math.math-tools :refer [lcm* gcd* coprime?]]
+            [clojure.math.combinatorics :refer [subsets cartesian-product]]
+            [clojure.core.reducers :as r]))
 
 (defn sum-numerator
   ([s lcm]
@@ -34,51 +35,55 @@
      :primes (map first pp-seq)
      :target-set (->> (first pp-seq)
                       subsets
-                      (map #(- target (sum-numerator % lcm)))
-                      (into #{}))}))
+                      (map #(- target (sum-numerator % lcm))))}))
 
 (defn gen-pp-map
   [info-map [pp md]]
-  (let [p (first (p/factors pp))
-        {:keys [pp-seq lcm limit]} info-map
-        pp-lcm (->> (take-while #(<= (first %) p) pp-seq)
-                    (map last)
-                    (apply *'))]
-    (->> (p/divisors pp-lcm)
-         (filter #(and (<= % limit) (= pp (gcd* (expt p 6) %))))
-         subsets
-         (map #(vector (sum-numerator % lcm) 1))
-         (map #(hash-map (mod (first %) (*' md md)) [%]))
-         (apply merge-with concat))))
+  (let [{:keys [pp-seq lcm limit]} info-map
+        pp-lcm (->> (map last pp-seq)
+                    (take-while #(coprime? % pp))
+                    (apply *')
+                    (quot lcm))
+        pp-sets (->> (range 1 (inc (quot limit pp)))
+                     (map #(*' pp %))
+                     (filter #(and (zero? (mod lcm %)) (= pp (gcd* % pp-lcm))))
+                     subsets)]
+    (transduce (comp
+                (map #(vector (sum-numerator % lcm) 1))
+                (map #(hash-map (mod (first %) (*' md md)) [%])))
+               (partial merge-with concat)
+               {} pp-sets)))
 
 (defn match-pp
   [info-map [pp md] res-map]
   (let [m (gen-pp-map info-map [pp md])]
     (->> (mapcat (fn [[sum s]]
-                   (let [dm (*' md md)
-                         r (mod sum dm)
-                         dr (if (zero? r) 0 (- dm r))]
-                     (when-let [ps (m dr)]
-                       (->> (cartesian-product [[sum s]] ps)
-                            (map (fn [ss] {(apply +' (map first ss))
-                                           (apply *' (map last ss))}))))))
-                 res-map)
+                     (let [dm (*' md md)
+                           r (mod sum dm)
+                           dr (if (zero? r) 0 (- dm r))]
+                       (when-let [ps (m dr)]
+                         (->> (cartesian-product [[sum s]] ps)
+                              (map (fn [ss] {(apply +' (map first ss))
+                                             (apply *' (map last ss))}))))))
+                   res-map)
          (apply merge-with +'))))
 
 (defn euler-152-2
   [limit]
   (let [info-map (gen-info-map limit)
-        {:keys [pp-seq target-set]} info-map]
-    (loop [pp-list (->> (mapcat #(map vector % (reverse %)) (rest pp-seq))
-                        reverse)
-           result {0 1}]
-      (if (empty? pp-list)
-        (->> (filter #(target-set (first %)) result)
-             (map last)
-             (apply +))
-        (recur (rest pp-list) (match-pp info-map (first pp-list) result))))))
+        {:keys [pp-seq target-set]} info-map
+        pp-list (->> (mapcat #(map vector % (reverse %)) (rest pp-seq))
+                     reverse)
+        pp-map (reduce #(match-pp info-map %2 %1) {0 1} pp-list)]
+    (->> (map #(pp-map %) target-set)
+         (remove nil?)
+         (apply +))))
 
 (comment
-  (gen-info-map 80)
-  (time (euler-152-2 140))
+  (defn power [s]
+    (loop [[f & r] (seq s) p '(())]
+      (if f (recur r (concat p (map (partial cons f) p)))
+          p)))
+  (power [1 2 3])
+  (time (euler-152-2 180))
   )

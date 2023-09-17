@@ -2,22 +2,19 @@
  :deps {org.clojure/clojure {:mvn/version "1.11.1"}
         org.clojure/math.numeric-tower {:mvn/version "0.0.5"}
         org.clojure/math.combinatorics {:mvn/version "0.2.0"}
-        clj-python/libpython-clj {:mvn/version "2.024"}
+        clj-python/libpython-clj {:mvn/version "2.025"}
         caesarhu.math/primes {:git/url "https://github.com/caesarhu/primes"
                               :git/tag "v0.1.19"
                               :git/sha "0592d98"}
         caesarhu.math/math-tools {:git/url "https://github.com/caesarhu/math-tools"
                                   :git/tag "v0.1.31"
                                   :git/sha "f82acb8"}
-        caesarhu/kuafu {:git/url "https://github.com/caesarhu/kuafu"
-                        :git/tag "v0.1.34"
-                        :git/sha "dfdd610"}
         aysylu/loom {:mvn/version "1.0.2"}
         org.clojure/data.priority-map {:mvn/version "1.1.0"}
         org.clojure/core.cache {:mvn/version "1.0.225"}
         org.clojure/core.memoize {:mvn/version "1.0.257"}
-        net.cgrand/xforms {:mvn/version "0.19.4"}
-        sicmutils/sicmutils {:mvn/version "0.23.0"}}
+        net.cgrand/xforms {:mvn/version "0.19.5"}
+        org.mentat/emmy {:mvn/version "0.31.0"}}
  :aliases
  {:build {:deps {io.github.seancorfield/build-clj
                  {:git/tag "v0.9.2" :git/sha "9c9f078"}}
