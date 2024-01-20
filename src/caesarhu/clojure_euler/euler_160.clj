@@ -1,33 +1,46 @@
 (ns caesarhu.clojure-euler.euler-160
-  (:require [caesarhu.math.math-tools :refer [power-mod digits]]
-            [clojure.math.numeric-tower :refer [expt gcd]]
-            [caesarhu.math.primes :as p]))
+  (:require [caesarhu.math.math-tools :refer [power-mod divmod]]
+            [clojure.math.numeric-tower :refer [expt]]
+            [caesarhu.math.chinese-remainder :as crt]))
 
-(defn legendre
-  [n p]
-  (quot (- n (apply + (digits n p)))
-        (dec p)))
+(defn mod-inv
+  [a b]
+  (let [b (if (neg? b) (- b) b)
+        a (if (neg? a) (- b (mod (- a) b)) a)
+        egcd (crt/extended-gcd a b)]
+    (when (= (first egcd) 1)
+      (mod (second egcd) b))))
+
+(defn *-not-5
+  [n p e]
+  (let [m (expt p e)
+        [q r] (divmod n m)
+        rem (reduce #(mod (* %1 %2) m)
+                    1
+                    (->> (range 1 (inc r))
+                         (remove #(zero? (mod % 5)))))]
+    (if (odd? q)
+      (mod (- rem) m)
+      rem)))
+
+(defn info
+  [n p e]
+  (let [m (expt p e)]
+    (loop [n n
+           ee 0
+           rem 1]
+      (if (zero? n)
+        [ee rem]
+        (recur (quot n 5) (+ ee (quot n 5)) (mod (* rem (*-not-5 n p e)) m))))))
 
 (defn euler-160
-  [n modulo]
-  (let [mod* (fn [& more] (reduce #(mod (* %1 %2) modulo) more))
-        init (apply mod* 1 (->> (range 1 (inc modulo) 2) (remove #(zero? (mod % 5)))))
-        e2 (- (legendre n 2) (legendre n 5))
-        e2r (power-mod 2 e2 modulo)
-        mod-other (fn [n init]
-                    (apply mod* init (->> (range 1 (inc (mod n modulo)) 2) (remove #(zero? (mod % 5))))))
-        fx (fn [n p]
-             (loop [n n
-                    v 1]
-               (if (< n 2) v
-                   (recur (quot n p) (mod* v (mod-other n init))))))
-        f2 (fn [n]
-             (loop [n n
-                    v 1]
-               (if (< n 2) v
-                   (recur (quot n 2) (mod* v (mod-other n init) (fx (quot n 5) 5))))))]
-    (mod* e2r (f2 n))))
+  [n d]
+  (let [[e !5] (info n 5 d)
+        r2 (power-mod 2 e (expt 5 d))
+        r2-inv (mod-inv r2 (expt 5 d))
+        r5 (mod (* !5 r2-inv) (expt 5 d))]
+    (int (crt/crt [(expt 2 d) (expt 5 d)] [0 r5]))))
 
 (comment
-  (time (euler-160 (expt 10 12) 100000))
+  (time (euler-160 (expt 10 12) 5))
   )
