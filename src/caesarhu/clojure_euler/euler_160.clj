@@ -11,27 +11,24 @@
     (when (= (first egcd) 1)
       (mod (second egcd) b))))
 
-(defn *-not-5
-  [n p e]
-  (let [m (expt p e)
-        [q r] (divmod n m)
-        rem (reduce #(mod (* %1 %2) m)
-                    1
-                    (->> (range 1 (inc r))
-                         (remove #(zero? (mod % 5)))))]
-    (if (odd? q)
-      (mod (- rem) m)
-      rem)))
-
 (defn info
   [n p e]
-  (let [m (expt p e)]
+  (let [m (expt p e)
+        product-not-5n (fn [n]
+                         (let [[q r] (divmod n m)
+                               rem (reduce #(mod (* %1 %2) m)
+                                           1
+                                           (->> (range 1 (inc r))
+                                                (remove #(zero? (mod % p)))))]
+                           (if (odd? q)
+                             (mod (- rem) m)
+                             rem)))]
     (loop [n n
            ee 0
            rem 1]
       (if (zero? n)
         [ee rem]
-        (recur (quot n 5) (+ ee (quot n 5)) (mod (* rem (*-not-5 n p e)) m))))))
+        (recur (quot n 5) (+ ee (quot n 5)) (mod (* rem (product-not-5n n)) m))))))
 
 (defn euler-160
   [n d]
