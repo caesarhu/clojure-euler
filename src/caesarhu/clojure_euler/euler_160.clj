@@ -39,5 +39,6 @@
     (int (crt/crt [(expt 2 d) (expt 5 d)] [0 r5]))))
 
 (comment
-  (time (euler-160 (expt 10 12) 5))
+  (euler-160 10 5)
+  (time (euler-160 (expt 10 10000) 5))
   )
