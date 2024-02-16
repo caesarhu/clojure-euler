@@ -46,5 +46,5 @@
         result))))
 
 (comment
-  (time (euler-184 1200))
+  (time (euler-184 105))
   )
