@@ -30,7 +30,7 @@
                          (apply +))})
          (apply merge))))
 
-(defn solve
+(defn euler-189
   [n]
   (loop [i (dec n)
          row row-init]
@@ -40,8 +40,5 @@
       (recur (dec i) (row-extend row)))))
 
 (comment
-  (->> row-init
-       row-extend
-       row-extend)
-  (time (solve 4))
+  (time (euler-189 8))
   )
