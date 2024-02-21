@@ -2,6 +2,8 @@
   (:require [clojure.math.numeric-tower :refer [expt exact-integer-sqrt sqrt]]
             [caesarhu.math.primes :as p]))
 
+; base on https://smsxgz.github.io/post/pe/counting_square_free_numbers/
+
 (defn isqrt
   [n]
   (-> (exact-integer-sqrt n) first))

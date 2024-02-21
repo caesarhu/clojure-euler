@@ -30,5 +30,6 @@
   (apply + (get-fits)))
 
 (comment
+  (neville [4 5 6] [10 21/4 1] 2 18)
   (time (euler-101))
   )
