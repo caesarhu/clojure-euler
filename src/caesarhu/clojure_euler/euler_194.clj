@@ -11,19 +11,15 @@
 
 (defn -gen-units
   [rule color-sets]
-  (if-let [idx (->> (for [i (range (count color-sets))
-                          :when (set? (color-sets i))]
-                      i)
-                    (apply min-key #(count (color-sets %))))]
-    (for [color (color-sets idx)]
-      (reduce (fn [unit pos]
-                (let [set-or-n (unit pos)]
-                  (if (set? set-or-n)
-                    (assoc unit pos (disj set-or-n color))
-                    unit)))
-              (assoc color-sets idx color)
-              (rule idx)))
-    color-sets))
+  (let [idx (some #(and (set? (color-sets %)) %) (range (count color-sets)))
+        reduce-color (fn [color]
+                       (reduce (fn [unit pos]
+                                 (if-let [set-or-n (and (set? (unit pos)) (unit pos))]
+                                   (assoc unit pos (disj set-or-n color))
+                                   unit))
+                               (assoc color-sets idx color)
+                               (rule idx)))]
+    (map reduce-color (color-sets idx))))
 
 (defn gen-units
   [rule color-sets]
@@ -33,16 +29,14 @@
       cs)))
 
 (comment
-  (time (euler-194 25 75 1984))
-  )
-
-(comment
   (let [s (->> (range 3 11)
                (map #(vector % (count (gen-units a-rule (vec (repeat 7 (colors %))))))))]
     [(vec (map first s)) (vec (map last s))])
+  ; [[3 4 5 6 7 8 9 10] [24 744 7440 41880 167160 530544 1429344 3404880]]
   (let [s (->> (range 3 11)
                (map #(vector % (count (gen-units b-rule (vec (repeat 7 (colors %))))))))]
     [(vec (map first s)) (vec (map last s))])
+  ; [[3 4 5 6 7 8 9 10] [36 1056 9720 51840 199500 616896 1629936 3824640]]
   )
 
 (defn neville [xs ys n x]
