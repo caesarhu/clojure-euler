@@ -30,10 +30,10 @@
             (or (last (for [k (range (ceil (/ a 2)) (inc a))
                             :let   [kn (+ (* k n-1) n-2)
                                     kd (+ (* k d-1) d-2)]
+                            :while (<= kd max-d)
                             :when  (if (and (even? a) (= k (/ a 2)))
                                      (< (different x kn kd) (different x n-1 d-1))
-                                     true)
-                            :while (<= kd max-d)]
+                                     true)]
                         kd))
                 d-1)
             (recur (rest a-vals) n-1 n d-1 d)))))))

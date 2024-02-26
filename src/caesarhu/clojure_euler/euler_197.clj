@@ -1,6 +1,6 @@
 (ns caesarhu.clojure-euler.euler-197
   (:require [clojure.math.numeric-tower :refer [expt]]
-            [caesarhu.math.cycle-detection :refer [floyd-detection-seq]]))
+            [caesarhu.math.cycle-detection :as c]))
 
 (def exp 30.403243784)
 (def log2 (Math/log10 2))
@@ -16,7 +16,7 @@
 
 (defn euler-197
   [n]
-  (let [[head cycled] (floyd-detection-seq u-seq)
+  (let [[head cycled] (c/floyd-detection-seq u-seq)
         length (count head)]
     (if (< n length)
       (+ (nth head n) (nth head (inc n)))
