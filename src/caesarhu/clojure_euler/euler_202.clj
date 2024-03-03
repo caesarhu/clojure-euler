@@ -1,5 +1,5 @@
 (ns caesarhu.clojure-euler.euler-202
-  (:require [clojure.math.numeric-tower :refer [expt gcd]]
+  (:require [clojure.math.numeric-tower :refer [gcd]]
             [caesarhu.math.primes :as p]))
 
 (defn euler-202-slow
@@ -13,31 +13,26 @@
          (* 2))))
 
 (defn euler202-helper
-  [z pVec]
-  (let [p-length (count pVec)
-        L (expt 2 p-length)
-        [dVec mVec] (loop [i 1 dVec [1] mVec [1] pVec pVec]
-                      (if (empty? pVec)
-                        [dVec mVec]
-                        (let [p (first pVec)]
-                          (recur (* i 2)
-                                 (into dVec (map #(* p %) (subvec dVec 0 i)))
-                                 (into mVec (map - (subvec mVec 0 i)))
-                                 (rest pVec)))))]
-    (->> (for [i (range L)
-               :let [x (quot z (dVec i))
+  [z p-vec]
+  (let [[d-vec m-vec] (reduce (fn [[d-vec m-vec] p]
+                                [(into d-vec (map #(* p %) d-vec))
+                                 (into m-vec (map - m-vec))])
+                              [[1] [1]]
+                              p-vec)]
+    (->> (for [i (range (count d-vec))
+               :let [x (quot z (d-vec i))
                      t (+ (quot (dec x) 3) (if (= 2 (mod x 3)) 1 0))]]
-           (* (mVec i) t))
+           (* (m-vec i) t))
          (apply +))))
 
 (defn euler-202
   [n]
-  (when (= 1 (mod n 2))
+  (when (odd? n)
     (let [z (quot (+ n 3) 2)
-          pVec (->> (p/factors z) frequencies keys sort)]
-      (euler202-helper z pVec))))
+          p-vec (->> (p/factors z) distinct)]
+      (euler202-helper z p-vec))))
 
 (comment
-  (time (euler-202-slow 1000001))
+  (time (euler-202-slow 12017639147))
   (time (euler-202 12017639147))
   )
