@@ -12,6 +12,9 @@
         caesarhu/kuafu {:git/url "https://github.com/caesarhu/kuafu"
                         :git/tag "v0.1.37"
                         :git/sha "8f13156"}
+        com.rpl/specter {:mvn/version "1.1.4"}
+        meander/epsilon {:mvn/version "0.0.650"}
+        metosin/potpuri {:mvn/version "0.5.3"}
         net.mikera/core.matrix {:mvn/version "0.63.0"}
         net.mikera/vectorz-clj {:mvn/version "0.48.0"}
         aysylu/loom {:mvn/version "1.0.2"}

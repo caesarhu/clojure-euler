@@ -11,7 +11,7 @@
 (defn lines
   [n]
   (->> (iterate next-blum (next-blum blum-init))
-       (take n)
+       (take (* 4 n))
        (map last)
        (partition 2)
        (partition 2)))
@@ -38,8 +38,7 @@
 (defn between?
   [pair x]
   (let [[a b] (sort pair)]
-    (and (> x a)
-         (< x b))))
+    (< a x b)))
 
 (defn line-inner?
   [line [x y]]
@@ -102,5 +101,5 @@
   (line-sweep (sorted-lines n)))
 
 (comment
-  (time (euler-165 20000))
+  (time (euler-165 5000))
   )
