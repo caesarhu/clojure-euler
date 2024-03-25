@@ -1,5 +1,6 @@
 (ns caesarhu.clojure-euler.euler-165
-  (:require [clojure.set :refer [union]]))
+  (:require [clojure.set :refer [union]]
+            [clojure.data.priority-map :refer [priority-map]]))
 
 (def blum-init [290797 0])
 
@@ -51,11 +52,10 @@
 (defn true-intersection
   [line-a line-b]
   (let [pos (intersection (formula line-a) (formula line-b))]
-    (if pos
+    (when pos
       (and (line-inner? line-a pos)
            (line-inner? line-b pos)
-           pos)
-      nil)))
+           pos))))
 
 (defn set-intersection
   [line other-lines]
@@ -69,36 +69,39 @@
   (->> (lines n)
        (map (fn [[a b]]
               (sort [(vec a) (vec b)])))
-       (map vec)
-       sort))
-(defn swap-line
-  [[a b]]
-  [b a])
+       (map vec)))
 
-(defn line-sweep
-  [lines-origin]
-  (loop [lines lines-origin
-         head-set #{}
-         tail-set (sorted-set)
-         result #{}]
-    (if-let [line (first lines)]
-      (let [[new-head new-tail] (loop [new-head head-set
-                                       new-tail tail-set]
-                                  (let [tail-line (first new-tail)]
-                                    (if (and tail-line
-                                             (<= (ffirst tail-line) (ffirst line)))
-                                      (recur (disj new-head (swap-line tail-line))
-                                             (disj new-tail tail-line))
-                                      [new-head new-tail])))]
-        (recur (rest lines)
-               (conj new-head line)
-               (conj new-tail (swap-line line))
-               (union result (set-intersection line head-set))))
-      (count result))))
+(defn sweep
+  [lines]
+  (let [lines (vec lines)
+        x-lines (->> (map #(apply map vector %) lines) (map first)
+                     (map vector (range (count lines))) (into (priority-map)))]
+    (loop [x-lines x-lines
+           target-x (priority-map)
+           y-head (priority-map)
+           y-tail (priority-map)
+           result #{}]
+      (if (empty? x-lines)
+        result
+        (let [[k [x0 x1] :as line] (first x-lines)
+              drop-keys (->> (subseq target-x <= x0) (map first))
+              new-target-x (apply dissoc target-x drop-keys)
+              new-y-head (apply dissoc y-head drop-keys)
+              new-y-tail (apply dissoc y-tail drop-keys)
+              [y0 y1] (->> (lines k) (apply map vector) last sort vec)
+              drop-y-keys (->> (subseq new-y-tail <= y0) (map key))
+              target (->> (subseq (apply dissoc new-y-head drop-y-keys) < y1)
+                          (map key))
+              intersections (set-intersection (lines k) (map lines target))]
+          (recur (rest x-lines)
+                 (merge new-target-x {k x1})
+                 (merge new-y-head {k y0})
+                 (merge new-y-tail {k y1})
+                 (union result intersections)))))))
 
 (defn euler-165
   [n]
-  (line-sweep (sorted-lines n)))
+  (->> (sweep (sorted-lines n)) count))
 
 (comment
   (time (euler-165 5000))

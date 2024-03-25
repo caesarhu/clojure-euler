@@ -1,4 +1,5 @@
-(ns caesarhu.clojure-euler.euler-212)
+(ns caesarhu.clojure-euler.euler-212
+  (:require [clojure.math.numeric-tower :refer [expt]]))
 
 (def sk
   (memoize
