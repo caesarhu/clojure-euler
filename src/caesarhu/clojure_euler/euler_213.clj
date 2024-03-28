@@ -94,7 +94,7 @@
 
 (defn mpower
   [a b]
-  (loop [r a n a e (dec b)]
+  (loop [r 1 n a e b]
     (cond
       (zero? e) r
       (= 1 (mod e 2)) (recur (m/mmul r n) n (dec e))
@@ -107,7 +107,11 @@
         total-trans-mat (mpower trans-mat steps)]
     (->> (m/sub 1 total-trans-mat)
          (apply map *)
-         (apply +))))
+         (apply +)
+         (* 1000000)
+         round
+         (#(/ % 1000000))
+         double)))
 
 (comment
   (time (euler-213 30 50))
