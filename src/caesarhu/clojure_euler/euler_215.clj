@@ -1,7 +1,6 @@
 (ns caesarhu.clojure-euler.euler-215
   (:require [clojure.math.combinatorics :as c]
-            [clojure.set :as s]
-            [clojure.math.numeric-tower :as math]))
+            [com.rpl.specter :as s]))
 
 (def bricks [2 3])
 
@@ -33,44 +32,45 @@
 (defn gen-next-rows
   [row]
   (let [width (apply + row)
-        gaps (set (reductions + (butlast row)))
-        result (atom (list))
-        gen (fn [rows]
-              (for [next-row rows
-                    n bricks
-                    :let [new-next-row (conj next-row n)
-                          sum (apply + new-next-row)]
-                    :when (and (<= sum width)
-                               (not (gaps sum)))]
-                (do
-                  (when (= width sum)
-                    (swap! result conj new-next-row))
-                  new-next-row)))]
-    (loop [next-rows (list [])]
+        gaps (set (reductions + (butlast row)))]
+    (loop [next-rows (list [])
+           result (list)]
       (if (empty? next-rows)
-        @result
-        (recur (gen next-rows))))))
+        result
+        (let [new-next-rows (->> (mapcat (fn [row] (map #(conj row %) bricks)) next-rows)
+                                 (remove #(> (apply + %) width))
+                                 (remove #(gaps (apply + %))))
+              matched (filter #(= width (apply + %)) new-next-rows)]
+          (recur new-next-rows (concat result matched)))))))
 
-(defn rows-product
-  [legal? rows]
-  (->> (mapcat #(gen-next-rows %) rows) (filter legal?)))
-
-(defn brute-force
+(defn euler-215
   [width high]
   (let [bricks-v (row-bricks width)
+        origin-rows (mapcat permutations-bricks bricks-v)
         crack-free? (apply gen-bricks-fn bricks-v)]
-    (->> (reduce (fn [rows _]
-                   (rows-product crack-free? rows))
-                 (mapcat permutations-bricks bricks-v)
-                 (range (dec high)))
-         count)))
+    (if (= high 1)
+      (count origin-rows)
+      (let [origin-map (->> origin-rows
+                           (mapcat #(map vector (repeat %) (->> (gen-next-rows %) (filter crack-free?))))
+                           (group-by first)
+                           (s/transform [s/MAP-VALS s/ALL] last))]
+        (loop [level 2
+               level-map (s/transform [s/MAP-VALS] count origin-map)]
+          (if (>= level high)
+            (->> (vals level-map) (apply +))
+            (recur (inc level)
+                   (->> (for [[row lower-rows] origin-map
+                              :let [n (level-map row)]
+                              lower-row lower-rows]
+                          {lower-row n})
+                        (apply merge-with +)))))))))
 
 (comment
-  (time (brute-force 9 3))
+  (time (euler-215 32 10))
   )
 
 ; https://projecteuler.net/thread=215;page=8 phyn's solution
-(defn euler-215
+(defn euler-215-phyn
   [width high]
   (let [states (atom {(vec (repeat high 0)) 1})
         option_transform {0 [1 2] 1 [0] 2 [1]}]
@@ -87,5 +87,5 @@
       (+ (@states final-state-A) (@states final-state-B)))))
 
 (comment
-  (time (euler-215 32 10))
+  (time (euler-215-phyn 32 10))
   )
