@@ -1,5 +1,5 @@
 (ns caesarhu.clojure-euler.euler-218
-  (:require [clojure.math.numeric-tower :refer [expt gcd sqrt]]
+  (:require [clojure.math.numeric-tower :refer [expt]]
             [caesarhu.math.math-tools :refer [pythagorean-mn square?]]))
 
 (defn pythagorean-triplet
