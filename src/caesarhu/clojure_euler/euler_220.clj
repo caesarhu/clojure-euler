@@ -4,7 +4,7 @@
 
 (def mp (atom {0 [0, 0] 1 [ 0, 1]}))
 
-(defn cal
+(defn calculate
   [c p]
   (let [[cx cy] c
         [px py] p]
@@ -20,7 +20,7 @@
                  pw))
           x1 (find-mp (quot pw 2))
           x2 (find-mp (- pw n))]
-      (swap! mp assoc n (cal x1 x2))
+      (swap! mp assoc n (calculate x1 x2))
       (@mp n))))
 
 (defn euler-220
