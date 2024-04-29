@@ -5,8 +5,10 @@
             [caesarhu.math.primes :as p]
             [clojure.set :as set]))
 
+(def bound 2500)
+
 (defn square
-  [n]
+  [^long n]
   (* n n))
 
 (defn pair?
@@ -44,36 +46,36 @@
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 
-(defn pythagorean
-  [limit]
-  (->> (pythagorean-triplet limit)
-       (mapcat (fn [v]
-              (->> (iterate inc 1)
-                   (map #(map (partial * %) v))
-                   (take-while #(< (apply + %) limit)))))))
+(defn find-xyz
+  [[a b c]]
+  (let [[a2 b2 c2] (map square [a b c])]
+    (for [i (range (+ (mod c 2) 2) (quot c 2) 2)
+          :let [i2 (square i)
+                x (quot (+ c2 i2) 2)
+                y (quot (- c2 i2) 2)
+                z (- b2 x)]
+          :when (and (square? (- x z))
+                     (square? (+ y z)))]
+      [x y z])))
 
-(defn match-squares
-  [limit]
-  (let [triplet-map (->> (pythagorean limit)
-                         (map #(hash-map (last %) [(take 2 %)]))
-                         (apply merge-with concat))]
-    (for [[f v] triplet-map
-          :let [ds (->> v (apply concat) set)]
-          [a e] v
-          [b d] (triplet-map e)
-          :when (and (ds d) (> d a) (even? (- (square d) (square a))))]
-      [a b (sqrt (+ (square a) (square b))) d e f])))
+(defn triplets
+  [^long limit]
+  (let [ts (->> (pythagorean-triplet #(<= (apply + %) limit))
+                (map sort))
+        times (fn [s]
+                (->> (iterate inc 1)
+                     (map (fn [n] (map #(* % n) s)))
+                     (take-while #(<= (apply + %) limit))))]
+    (mapcat times ts)))
 
 (defn euler-142
-  [limit]
-  (->> (match-squares limit)
-       (map (fn [[a b c d e f]]
-              (let [z (/ (- (square d) (square a)) 2)
-                    y (+ z (square a))
-                    x (+ y (square b))]
-                [(+ x y z) [x y z] [a b c d e f]])))
-       sort))
+  []
+  (->> (triplets bound)
+       (mapcat find-xyz)
+       (map #(apply + %))
+       (apply min)))
 
 (comment
-  (time (euler-142 2500))
+  (time (triplets 2500))
+  (time (euler-142))
   )

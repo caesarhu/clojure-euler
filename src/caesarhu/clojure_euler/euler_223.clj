@@ -43,7 +43,7 @@
 
 ; https://projecteuler.net/thread=223;page=5 lightln2's solution
 (defn next-almost-triangles
-  [[a b c]]
+  [[^long a, ^long b, ^long c]]
   (let [a1 (+ a (- b) c)
         b1 (+ a (quot (+ b c) 2))
         c1 (+ a (quot (- (* 3 c) b) 2))
@@ -68,4 +68,5 @@
 
 (comment
   (time (euler-223 target))
+  (next-almost-triangles [2 2 3])
   )

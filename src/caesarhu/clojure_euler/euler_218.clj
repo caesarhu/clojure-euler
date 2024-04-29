@@ -1,32 +1,32 @@
 (ns caesarhu.clojure-euler.euler-218
   (:require [clojure.math.numeric-tower :refer [expt]]
-            [caesarhu.math.math-tools :refer [pythagorean-mn square?]]))
+            [caesarhu.math.math-tools :refer [next-pythagorean-triplet square?]]))
 
-(defn pythagorean-triplet
-  [limit]
-  (->> (map pythagorean-mn (iterate inc 2))
-       (map (fn [v] (take-while #(<= (last %) limit) v)))
-       (take-while not-empty)
-       (apply concat)))
+(defn super-perfect?
+  [[^long a, ^long b]]
+  (-> (*' a b) (mod 168) zero?))
 
-(defn not-super-perfect?
-  [v]
-  (let [[a b c] v
-        x (quot (*' a b) 2)]
-    (and (square? c) (pos-int? (mod x 6)) (pos-int? (mod x 28)))))
+(defn generate-perfect
+  [a b]
+  [(abs (- (* a a) (* b b)))
+   (* 2 a b)])
 
 (defn euler-218
-  [limit]
-  (let [target (expt limit 1/2)
-        triplets (pythagorean-triplet target)
-        sum (->> (filter not-super-perfect? triplets) count)
-        make-perfect (fn [v]
-                       (let [[a b c] v]
-                         [(- (* b b) (* a a)) (* 2 a b) (* c c)]))]
-    (->> (map make-perfect triplets)
-         (filter not-super-perfect?)
-         count
-         (+ sum))))
+  [^long limit]
+  (loop [base (list [3 4 5])
+         sum 0]
+    (if (empty? base)
+      sum
+      (let [new-triangles (->> (next-pythagorean-triplet (first base))
+                               (filter (fn [s]
+                                         (let [c (last s)
+                                               c2 (* c c)]
+                                           (<= c2 limit)))))
+            count-not-super (->> (map #(apply generate-perfect (take 2 %)) new-triangles)
+                                 (remove super-perfect?)
+                                 count)]
+        (recur (apply conj (rest base) new-triangles)
+               (+ sum count-not-super))))))
 
 (comment
   (time (euler-218 (expt 10 16)))
