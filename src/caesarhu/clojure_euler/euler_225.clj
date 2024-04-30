@@ -1,16 +1,21 @@
 (ns caesarhu.clojure-euler.euler-225)
 
-(def tribonacci
-  (memoize
-   (fn [n]
-     (if (<= n 3) 1
-         (+ (tribonacci (- n 1))
-            (tribonacci (- n 2))
-            (tribonacci (- n 3)))))))
+(defn non-divisors
+  [^long n]
+  (loop [v [1 1 1]]
+    (let [new (mod (apply + v) n)
+          new-v (conj (subvec v 1) new)]
+      (cond
+        (zero? new) false
+        (= new-v [1 1 1]) true
+        :else (recur new-v)))))
 
-(def tribonacci-seq
-  (map tribonacci (iterate inc 1)))
+(defn euler-225
+  [^long target]
+  (nth (->> (iterate (partial + 2) 3)
+            (filter non-divisors))
+       (dec target)))
 
 (comment
-  tribonacci-seq
+  (time (euler-225 124))
   )
