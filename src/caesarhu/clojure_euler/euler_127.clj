@@ -1,31 +1,29 @@
 (ns caesarhu.clojure-euler.euler-127
-  (:require [caesarhu.math.math-tools :refer [coprime?]]
+  (:require [caesarhu.math.math-tools :refer [coprime? factors-range]]
             [clojure.data.priority-map :refer [priority-map]]
             [caesarhu.math.primes :as p]
-            [clojure.math.numeric-tower :refer [sqrt]]))
+            [clojure.math.numeric-tower :refer [sqrt]]
+            [clojure.set :refer [union]]))
 
 (defn rad-map
-  [limit]
-  (let [rad (atom (vec (repeat limit 1)))]
-    (doseq [p (p/primes)
-            :while (< p limit)
-            px (iterate #(+ p %) p)
-            :while (< px limit)]
-      (swap! rad update px * p))
-    (->> (range 1 limit)
-         (map #(vector % (@rad %)))
-         (into (priority-map)))))
+  [^long limit]
+  (->> (factors-range limit)
+       (map #(apply * (keys %)))
+       (map vector (range))
+       (drop 1)
+       (into (priority-map))))
 
 (defn abc-hits
-  [limit]
+  [^long limit]
   (let [m (rad-map limit)
-        valid-ab (fn [c x]
-                   (let [y (- c x)
-                         upper-bound (/ c (* (m x) (m c)))]
-                     (when (and (< x c) (coprime? (m c) (m x)) (< 1 (m y) upper-bound))
-                       (sorted-set x y c))))
+        valid-ab (fn [c a]
+                   (let [b (- c a)
+                         upper-bound (/ c (* (m a) (m c)))]
+                     (when (and (< a c) (coprime? (m c) (m a)) (< 1 (m b) upper-bound))
+                       (vec (sort [a b c])))))
         valid-c (fn [c]
-                  (when-let [qc (as-> (/ c (m c)) q (when (> q 2) q))]
+                  (when-let [qc (let [q (/ c (m c))]
+                                  (when (> q 2) q))]
                     (->> (subseq m < (sqrt qc))
                          (map first)
                          (map #(valid-ab c %))
@@ -34,13 +32,11 @@
     (mapcat valid-c (range 1 limit))))
 
 (defn euler-127
-  [limit]
+  [^long limit]
   (->> (abc-hits limit)
        (map last)
        (apply +)))
 
 (comment
-  (subseq (->> (map vector (range 10) (range 10))
-               (into (sorted-map))) < 5)
-  (time (->> (euler-127 120000)))
+  (time (euler-127 120000))
   )

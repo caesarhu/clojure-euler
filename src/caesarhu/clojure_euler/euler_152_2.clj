@@ -80,10 +80,5 @@
          (apply +))))
 
 (comment
-  (defn power [s]
-    (loop [[f & r] (seq s) p '(())]
-      (if f (recur r (concat p (map (partial cons f) p)))
-          p)))
-  (power [1 2 3])
-  (time (euler-152-2 180))
+  (time (euler-152-2 80))
   )

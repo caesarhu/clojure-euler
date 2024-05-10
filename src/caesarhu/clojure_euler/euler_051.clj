@@ -32,7 +32,7 @@
   [n]
   (some (fn [p]
           (and (some #(>= (count-primes %) n) (transfrom p)) p))
-        (drop 4 (p/primes))))
+        (drop-while #(< % 100000) (p/primes))))
 
 (comment
   (time (euler-051 8))
