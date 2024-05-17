@@ -3,11 +3,11 @@
         org.clojure/math.numeric-tower {:mvn/version "0.1.0"}
         org.clojure/math.combinatorics {:mvn/version "0.3.0"}
         caesarhu.math/primes {:git/url "https://github.com/caesarhu/primes"
-                              :git/tag "v0.1.20"
-                              :git/sha "7e9688e"}
+                              :git/tag "v0.1.26"
+                              :git/sha "090d9b1"}
         caesarhu.math/math-tools {:git/url "https://github.com/caesarhu/math-tools"
-                                  :git/tag "v0.1.45"
-                                  :git/sha "96b51fc"}
+                                  :git/tag "v0.1.46"
+                                  :git/sha "60b473e"}
         caesarhu/kuafu {:git/url "https://github.com/caesarhu/kuafu"
                         :git/tag "v0.1.37"
                         :git/sha "8f13156"}
@@ -23,6 +23,7 @@
         org.clojure/core.memoize {:mvn/version "1.1.266"}
         net.cgrand/xforms {:mvn/version "0.19.6"}
         org.mentat/emmy {:mvn/version "0.31.0"}
+        rm-hull/markov-chains {:mvn/version "0.1.1"}
         criterium/criterium {:mvn/version "0.4.6"}}
  :aliases
  {:build {:deps {io.github.seancorfield/build-clj

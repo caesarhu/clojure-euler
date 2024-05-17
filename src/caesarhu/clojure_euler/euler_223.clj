@@ -1,6 +1,5 @@
 (ns caesarhu.clojure-euler.euler-223
-  (:require [caesarhu.math.primes :as p]
-            [caesarhu.math.math-tools :refer [factors-range]]
+  (:require [caesarhu.math.primes :as p :refer [range-factors]]
             [clojure.math.numeric-tower :refer [expt]]))
 
 (def target 25000000)
@@ -32,7 +31,7 @@
 
 (defn euler-223-slow
   [^long limit]
-  (let [factors-map (factors-range (+ 2 (quot limit 3)))]
+  (let [factors-map (range-factors (+ 2 (quot limit 3)))]
     (->> (range 1 (quot limit 3))
          (map #(almost-triangles factors-map limit %))
          (apply +))))
@@ -68,5 +67,4 @@
 
 (comment
   (time (euler-223 target))
-  (next-almost-triangles [2 2 3])
   )

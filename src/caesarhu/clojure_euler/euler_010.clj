@@ -6,5 +6,5 @@
   (apply + (primes n)))
 
 (comment
-  (time (euler-010 2000000))
+  (time (count (primes 2000000)))
   )

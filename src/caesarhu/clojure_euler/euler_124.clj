@@ -1,5 +1,5 @@
 (ns caesarhu.clojure-euler.euler-124
-  (:require [caesarhu.math.math-tools :refer [factors-range]]))
+  (:require [caesarhu.math.primes :refer [range-factors]]))
 
 (defn rad
   [m]
@@ -7,7 +7,7 @@
 
 (defn euler-124
   [limit target]
-  (nth (->> (factors-range limit)
+  (nth (->> (range-factors (dec limit))
             (map rad)
             (map vector (range))
             (drop 1)

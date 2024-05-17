@@ -3,23 +3,6 @@
             [caesarhu.math.math-tools :refer [power-mod]]
             [clojure.math.numeric-tower :refer [expt]]))
 
-(defn power-of-prime
-  [limit p]
-  (->> (for [px (map #(expt p %) (iterate inc 1))
-             :while (<= px limit)]
-         (for [t (iterate inc 1)
-               :let [tpx (* t px)]
-               :while (<= tpx limit)]
-           {tpx {p 1}}))
-       flatten
-       (apply merge-with (fn [m1 m2] (merge-with + m1 m2)))))
-
-(defn factors-range
-  [limit]
-  (->> (for [p (take-while #(< % limit) (p/primes))]
-         (power-of-prime limit p))
-       (apply merge-with (fn [m1 m2] (merge-with + m1 m2)) (sorted-map))))
-
 (defn divisors
   [factor-map n]
   (let [m (factor-map n)
@@ -40,7 +23,7 @@
 
 (defn euler-133
   [limit]
-  (let [factor-map (factors-range limit)
+  (let [factor-map (p/range-factors limit)
         power-10? (fn [p] (when (> p 5)
                             (-> (repunit-length factor-map p)
                                 factor-map
@@ -60,7 +43,7 @@
 
 (defn factor-10n?
   [limit p]
-  (let [power (->> (map #(vector % (expt 2 %)) (iterate inc 1)) 
+  (let [power (->> (map #(vector % (expt 2 %)) (iterate inc 1))
                    (take-while #(< (last %) limit))
                    last
                    first)]
@@ -73,5 +56,6 @@
        (apply +)))
 
 (comment
+  (time (euler-133 100000))
   (time (euler-133-fast 100000))
   )

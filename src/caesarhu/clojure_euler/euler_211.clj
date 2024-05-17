@@ -1,43 +1,55 @@
 (ns caesarhu.clojure-euler.euler-211
-  (:require [caesarhu.math.primes :as p]
-            [clojure.math.combinatorics :as c]
-            [caesarhu.math.pell-equation :refer [pell-solutions]]
-            [caesarhu.math.math-tools :refer [square? digits]]
-            [clojure.math.numeric-tower :refer [exact-integer-sqrt expt]]))
+  (:require [clojure.math.numeric-tower :refer [expt sqrt]]
+            [caesarhu.math.primes :as p]
+            [clojure.core.reducers :as r]))
 
-(defn isqrt
+(defn is-square?
   [^long n]
-  (first (exact-integer-sqrt n)))
-
-(defn square
-  [^long n]
-  (* n n))
-
-(defn square-sum
-  [^long limit]
-  (let [v (atom [0 1])]
-    (doseq [i (range 2 limit)]
-      (swap! v assoc i (inc (square i))))
-    (doseq [i (range 2 (isqrt limit))]
-      (loop [m i
-             j (* i m)]
-        (when (< j limit)
-          (if (= i m)
-            (swap! v update j + (square i))
-            (swap! v update j + (+ (square i) (square m))))
-          (recur (inc m) (+ j i)))))
-    @v))
+  (let [sqr (sqrt n)]
+    (= (* sqr sqr) n)))
 
 (defn brute-force
   [^long limit]
-  (let [sum-vec (square-sum limit)
-        is-divisors-square? (fn [i]
-                              (let [n (sum-vec i)]
-                                (when (square? n)
-                                  i)))
-        result (keep is-divisors-square? (range 1 limit))]
-    (apply + result)))
+  (let [prime-seq (p/primes limit)
+        prime-set (set prime-seq)
+        factors (fn [^long n] (frequencies (p/factors n prime-seq)))
+        divisor-square-sum (fn [^long n]
+                             (->> (for [[p e] (factors n)]
+                                    (->> (for [i (range 1 (inc e))]
+                                           (if (= i 1)
+                                             (inc (* p p))
+                                             (expt p (* i 2))))
+                                         (apply +)))
+                                  (apply *)))]
+    (inc (r/fold + (r/filter #(is-square? (divisor-square-sum %)) (r/remove prime-set (range 2 limit)))))))
 
 (comment
   (time (brute-force 64000000))
+  )
+
+(defn prime-sigma2
+  [^long prime, ^long e]
+  (r/fold + (for [i (range 1 (inc e))]
+              (if (= i 1)
+                (inc (* prime prime))
+                (expt prime (* i 2))))))
+
+(defn euler-211
+  [^long limit]
+  (let [v (reduce (fn [v p]
+                    (if-not (= (v p) 1) v
+                            (loop [i (+ p p)
+                                   s (rest (p/power-seq (dec limit) p))
+                                   nv v]
+                              (if (empty? s) nv
+                                  (recur (+ i p) (next s) (update nv i * (prime-sigma2 p (first s))))))))
+                  (vec (repeat limit 1))
+                  (range 2 limit))]
+    (inc (r/fold + (for [i (range 2 limit)
+                         :let [sigma2 (v i)]
+                         :when (and (not= sigma2 1) (is-square? sigma2))]
+                     i)))))
+
+(comment
+  (time (euler-211 64000000))
   )

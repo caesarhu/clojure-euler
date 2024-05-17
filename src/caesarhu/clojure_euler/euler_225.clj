@@ -10,12 +10,12 @@
         (= new-v [1 1 1]) n
         :else (recur new-v)))))
 
-(defn euler-225-loop
+(defn euler-225
   [^long target]
   (nth (->> (iterate (partial + 2) 3)
             (filter non-divisors-loop))
        (dec target)))
 
 (comment
-  (time (euler-225-loop 124))
+  (time (euler-225 124))
   )

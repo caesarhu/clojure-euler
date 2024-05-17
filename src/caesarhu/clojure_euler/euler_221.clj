@@ -1,21 +1,21 @@
 (ns caesarhu.clojure-euler.euler-221
-  (:require [caesarhu.math.primes :as p]
-            [caesarhu.math.math-tools :refer [power-mod]]))
+  (:require [clojure.math.numeric-tower :refer [sqrt]]))
 
 (defn gen-alexandrian
-  [n]
-  (let [p (inc (*' n n))
-        d-seq (p/divisors p)]
-    (for [d (take (quot (inc (count d-seq)) 2) d-seq)]
-      (*' n (+' n d) (+' n (quot p d))))))
+  [^long n]
+  (if (= n 1) [6]
+      (let [p (inc (*' n n))]
+        (for [d (range 1 n)
+              :when (zero? (mod p d))]
+          (*' n (+' n d) (+' n (quot p d)))))))
 
 (defn euler-221
   [target]
   (loop [answer-set (sorted-set)
-         p 1]
-    (if (>= (count answer-set) (* 4 target))
+         n 1]
+    (if (>= (count answer-set) (long (* 3.5 target)))
       (nth (seq answer-set) (dec target))
-      (recur (apply conj answer-set (gen-alexandrian p)) (inc p)))))
+      (recur (apply conj answer-set (gen-alexandrian n)) (inc n)))))
 
 (comment
   (time (euler-221 150000))

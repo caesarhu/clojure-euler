@@ -1,13 +1,13 @@
 (ns caesarhu.clojure-euler.euler-127
-  (:require [caesarhu.math.math-tools :refer [coprime? factors-range]]
+  (:require [caesarhu.math.math-tools :refer [coprime?]]
             [clojure.data.priority-map :refer [priority-map]]
-            [caesarhu.math.primes :as p]
+            [caesarhu.math.primes :as p :refer [range-factors]]
             [clojure.math.numeric-tower :refer [sqrt]]
             [clojure.set :refer [union]]))
 
 (defn rad-map
   [^long limit]
-  (->> (factors-range limit)
+  (->> (range-factors limit)
        (map #(apply * (keys %)))
        (map vector (range))
        (drop 1)

@@ -17,7 +17,7 @@
   (->> (p/factors n)
        (apply distinct?)))
 
-(defn brute-force
+(defn euler-203
   [n]
   (->> (pascal-triangle n)
        (apply concat)
@@ -26,5 +26,5 @@
        (apply +)))
 
 (comment
-  (time (brute-force 51))
+  (time (euler-203 51))
   )
