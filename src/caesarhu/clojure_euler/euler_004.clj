@@ -1,14 +1,20 @@
 (ns caesarhu.clojure-euler.euler-004
   (:require [caesarhu.math.math-tools :refer [palindrome?]]))
 
+(def start 999)
+(def end 100)
+
 (defn euler-004
   []
-  (let [seq-11 (->> (range 11 1000 11) (drop-while #(< % 100)) (take-while #(< % 1000)))]
-    (->> (range 999 900 -1)
-         (mapcat (fn [n] (map #(* n %) seq-11)))
-         (into (sorted-set-by >))
-         (filter palindrome?)
-         first)))
+  (->> (for [i (range start end -1)
+             :let [dj (if (zero? (mod i 11)) 1 11)
+                   j-start (if (zero? (mod i 11)) i
+                             (* 11 (quot i 11)))]]
+         (first (for [j (range j-start end (- dj))
+                      :when (palindrome? (* i j))]
+                  (* i j))))
+       (remove nil?)
+       (apply max)))
 
 (comment
   (time (euler-004))

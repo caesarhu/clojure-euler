@@ -2,7 +2,7 @@
   (:require [caesarhu.math.math-tools :as tools]
             [clojure.math.combinatorics :as combo]))
 
-(defn is-pandigital? 
+(defn is-pandigital?
   [xs]
   (= "123456789" (->> (apply str xs)
                       sort

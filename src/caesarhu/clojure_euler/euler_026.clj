@@ -17,5 +17,5 @@
   (apply max-key cycle-length (range 2 limit)))
 
 (comment
-  (time (euler-026 1000))
+  (time (euler-026 10))
   )
