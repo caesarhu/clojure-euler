@@ -21,5 +21,5 @@
        (apply +)))
 
 (comment
-  (euler-059)
+  (time (euler-059))
   )

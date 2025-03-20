@@ -3,19 +3,21 @@
             [caesarhu.math.math-tools :as tools]
             [clojure.math.combinatorics :as combo]))
 
-(defn valid-pair?
+(defn is-pair?
   [p1 p2]
-  (let [d1 (tools/digits p1)
-        d2 (tools/digits p2)]
-    (->> [(concat d1 d2) (concat d2 d1)]
-         (map tools/digits->number)
-         (every? p/is-prime?))))
+  (and (pos-int? (mod (+ p1 p2) 3))
+       (let [d1 (tools/digits p1)
+             d2 (tools/digits p2)]
+         (->> [(concat d1 d2) (concat d2 d1)]
+              (map tools/digits->number)
+              (every? p/is-prime?)))))
 
 (defn next-map
   [m]
   (->> (for [[k v] m
              p v
-             :let [ps (filter #(valid-pair? p %) v)]]
+             :let [pk (conj k p)]
+             :let [ps (filter #(is-pair? p %) v)]]
          {(conj k p) ps})
        (apply merge)))
 
@@ -27,7 +29,6 @@
       (->> (keys m) (map #(apply + %)) (apply min))
       (recur (next-map m) (dec n)))))
 
-
 (comment
-  (time (euler-060 10000 5))
+  (time (euler-060 8500 5))
   )
