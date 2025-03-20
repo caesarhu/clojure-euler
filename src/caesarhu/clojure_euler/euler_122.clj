@@ -3,15 +3,15 @@
 (defn back-track
   [limit]
   (let [cost (atom (vec (cons 0 (repeat limit limit))))
-        path (atom [1])]
-    (letfn [(recursive
+        path (atom [])]
+    (letfn [(track
               [power depth]
               (when (and (<= power limit) (<= depth (@cost power)))
                 (swap! cost assoc power depth)
                 (swap! path assoc depth power)
                 (doseq [d (range depth -1 -1)]
-                  (recursive (+ power (@path d)) (inc depth)))))]
-      (recursive 1 0))
+                  (track (+ power (@path d)) (inc depth)))))]
+      (track 1 0))
     @cost))
 
 (defn euler-122
